@@ -4,14 +4,14 @@ import os
 import matplotlib
 import matplotlib.pyplot as plt
 
-from skimage import img_as_float
+from skimage import img_as_float, img_as_ubyte
 from skimage.exposure import adjust_gamma, adjust_log
 from skimage.io import imread, imsave, imshow
 from skimage.filters import threshold_sauvola
 
+from tools.peakdetect import *
 
 matplotlib.rcParams['font.size'] = 9
-
 
 
 def readImage(filename):
@@ -34,7 +34,7 @@ def binarise (image):
 
     binary_sauvola = image > thresh_sauvola
 
-    return img_as_float(binary_sauvola)
+    return binary_sauvola
 
 
 def writeBinarisedImage(image, filename):
@@ -44,7 +44,25 @@ def writeBinarisedImage(image, filename):
     imsave(fname=path_output,arr=image)
 
 
-# Main
+
+
+
+def segment(image):
+    max_peaks, min_peaks = peakdetect(image, lookahead=40)
+    print(min_peaks)
+    return ''
+
+
+#    peak = []
+#    for y in peaks[0]:
+##        peak.append(y[0])
+  #      # plt.plot(y[0], y[1], "r*")
+   #     cv2.line(rotated2, (0, y[0]), (W, y[0]), (255, 0, 0), 3)
+
+
+
+####### Main ########
+#####################
 
 inputImageName = sys.argv[1]
 outputImageName = sys.argv[2]
@@ -55,6 +73,19 @@ inputImage = readImage(inputImageName)
 
 # Binarise using Sauvola binarisation with threshold=0.5
 binarisedImage = binarise (inputImage)
+binarisedImage = img_as_ubyte(binarisedImage)
+
+# Save binarised image
+writeBinarisedImage(binarisedImage, outputImageName)
+
+##########################
+
+### Segment it ###
+
+segmentedImage = segment(binarisedImage)
+
+
+
 
 
 # Show all preprocessing steps
