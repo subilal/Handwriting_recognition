@@ -1,5 +1,4 @@
-import sys
-import os
+import sys, os
 
 import cv2
 
@@ -61,14 +60,14 @@ def writeImage(image, filename):
 #####################
 
 def preprocess(inputImageName, outputDirectory):
-    # Read name
+    # Read image.
     inputImage = readImage(inputImageName)
 
-    # Binarise using Sauvola binarisation with threshold=0.5
+    # Binarise image using both Sauvola and Otsu methods.
     binarisedSauvola = binariseSauvola(inputImage)
     binarisedOtsu = binariseOtsu(inputImage)
 
-    # Save binarised image
+    # Save binarised images.
     writeImage(binarisedSauvola, outputDirectory+"/binarisedSauvola.jpg")
     writeImage(binarisedOtsu, outputDirectory+"/binarisedOtsu.jpg")
 
@@ -77,15 +76,15 @@ def preprocess(inputImageName, outputDirectory):
     # Credit: https://stackoverflow.com/questions/46441893/connected-component-labeling-in-python
     ret, labels = cv2.connectedComponents(binarisedOtsu)
 
-    # Map component labels to hue val
+    # Map component labels to hue val.
     label_hue = np.uint8(179 * labels / np.max(labels))
     blank_ch = 255 * np.ones_like(label_hue)
     labeled_img = cv2.merge([label_hue, blank_ch, blank_ch])
 
-    # cvt to BGR for display
+    # cvt to BGR for display.
     labeled_img = cv2.cvtColor(labeled_img, cv2.COLOR_HSV2BGR)
 
-    # set bg label to black
+    # set bg label to black.
     labeled_img[label_hue == 0] = 0
 
     writeImage(labeled_img, outputDirectory+"/labeled_otsu.jpg")
@@ -93,12 +92,12 @@ def preprocess(inputImageName, outputDirectory):
 
     # Second attempt:
     nb_components, output, stats, centroids = cv2.connectedComponentsWithStats(binarisedOtsu, connectivity=4)
-    print (nb_components)
-    print (output)
-    print (stats)
-    print (centroids)
+#    print (nb_components)
+#    print (output)
+#    print (stats)
+#    print (centroids)
 
-    # Get the largest component
+    # Get the largest component.
     sizes = stats[:, -1]
     max_label = 1
     max_size = sizes[1]
@@ -109,6 +108,7 @@ def preprocess(inputImageName, outputDirectory):
     labeled_img_with_stats = np.zeros(output.shape)
     labeled_img_with_stats[output == max_label] = 255
 
+#    labeled_img_with_stats = img_as_ubyte(labeled_img_with_stats)
     writeImage(labeled_img_with_stats, outputDirectory+"/labeled_otsu_with_stats.jpg")
 
 
