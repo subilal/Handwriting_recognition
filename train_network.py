@@ -60,17 +60,16 @@ if __name__ == "__main__":
 	# image = np.asarray(train_data[512]).squeeze()
 	# plt.imshow(image)
 	# plt.show()
-
-	(train_images, test_images, train_labels, test_labels) = train_test_split(data,	labels, test_size=0.25, random_state=42)
+	
 	label_encoder = LabelEncoder()
-	integer_encoded1 = label_encoder.fit_transform(train_labels)
-	integer_encoded2 = label_encoder.fit_transform(test_labels)
+	integer_encoded = label_encoder.fit_transform(labels)	
+	(train_images, test_images, train_labels, test_labels) = train_test_split(data,	integer_encoded, test_size=0.25, random_state=42)
 
 	# cv.imshow("", train_images[10])
 	# cv.waitKey(0)
 
-	train_labels = keras.utils.to_categorical(integer_encoded1)
-	test_labels = keras.utils.to_categorical(integer_encoded2)
+	train_labels = keras.utils.to_categorical(train_labels)
+	test_labels = keras.utils.to_categorical(test_labels)
 	opt = keras.optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False)
 	model.network.compile(optimizer=opt, loss='categorical_crossentropy', metrics=['accuracy'])
 	hist = model.network.fit(train_images, train_labels, batch_size = 15, validation_data=(test_images, test_labels), epochs=35)
