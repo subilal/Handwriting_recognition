@@ -47,7 +47,7 @@ class CNN():
 
 if __name__ == "__main__":
 
-	data_path = './character_data'
+	data_path = '../character_data'
 	model = CNN()	
 
 	[data, labels] = model.extract_data(data_path)

@@ -14,6 +14,8 @@ matplotlib = "*"
 skimage = "*"
 scikit-image = "*"
 scipy = "*"
+tensorflow = "*"
+tensorflow-gpu = "*"
 
 [requires]
 python_version = "3.7"
