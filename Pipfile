@@ -6,16 +6,7 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-requests = "*"
-opencv = "*"
-opencv-python = "*"
-numpy = "*"
-matplotlib = "*"
-skimage = "*"
-scikit-image = "*"
-scipy = "*"
-tensorflow = "*"
-tensorflow-gpu = "*"
+idx2numpy = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.6"
