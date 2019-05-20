@@ -47,7 +47,7 @@ class CNN():
 
 if __name__ == "__main__":
 
-	data_path = '../character_data'
+	data_path = './character_data'
 	model = CNN()	
 
 	[data, labels] = model.extract_data(data_path)
@@ -65,6 +65,17 @@ if __name__ == "__main__":
 	integer_encoded = label_encoder.fit_transform(labels)	
 	(train_images, test_images, train_labels, test_labels) = train_test_split(data,	integer_encoded, test_size=0.25, random_state=42)
 
+	datagen = keras.preprocessing.image.ImageDataGenerator(
+			width_shift_range=0.2,
+			height_shift_range=0.2,
+			shear_range=0.2,
+			zoom_range=0.2,
+			horizontal_flip=False,
+			vertical_flip=False,
+			fill_mode='nearest')
+
+	datagen.fit(train_images)
+
 	# cv.imshow("", train_images[10])
 	# cv.waitKey(0)
 
@@ -72,7 +83,7 @@ if __name__ == "__main__":
 	test_labels = keras.utils.to_categorical(test_labels)
 	opt = keras.optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False)
 	model.network.compile(optimizer=opt, loss='categorical_crossentropy', metrics=['accuracy'])
-	hist = model.network.fit(train_images, train_labels, batch_size = 15, validation_data=(test_images, test_labels), epochs=35)
+	hist = model.network.fit_generator(datagen.flow(train_images, train_labels, batch_size=100), validation_data=(test_images, test_labels), epochs=100)
 	model.network.save('trained_cnn.h5')
 	with open('trainHistoryDict', 'wb') as file:
 		pickle.dump(hist.history, file)
