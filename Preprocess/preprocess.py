@@ -12,7 +12,6 @@ from skimage.exposure import adjust_gamma, adjust_log
 from skimage.io import imread, imsave, imshow
 from skimage.filters import threshold_sauvola, threshold_otsu
 
-os.path.join(os.path.abspath(__file__))
 from .tools.peakdetect import *
 
 matplotlib.rcParams['font.size'] = 9
