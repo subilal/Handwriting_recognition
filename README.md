@@ -24,10 +24,21 @@ Recognition - module containing the classifier used for recognition of the handw
 
 (This application is programmed in Python 3. For brevity, `python3` commands will be used as `python`).
 
+Installation:
+
+- install Python 3 (ideally 3.6.x, but not 3.7.x because it does not support TensorFlow yet)
+
+- install `pipenv` using `pip install pipenv`
+
+- install the program using `pipenv install` when you are in the main folder.
+
 For preprocessing:
 
-`python Preprocess\preprocess.py name-of-input-file name-of-output-file`
+`pipenv run python Preprocess\preprocess.py name-of-input-file name-of-output-file`
 
 For recognition:
 
+`pipenv run Classifier\train_network.py`
+
 All together:
+`python main.py input_folder`
