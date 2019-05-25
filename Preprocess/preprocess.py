@@ -309,6 +309,10 @@ def preprocess(inputImageName, outputDirectory):
     
 
 
+# Now we want to segment the image
+# TODO: segmentation.
+
+
     print ("Preprocessing successful!")
 
     ##########################
