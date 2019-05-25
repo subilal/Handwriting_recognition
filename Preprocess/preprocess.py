@@ -13,7 +13,7 @@ from skimage.io import imread, imsave, imshow
 from skimage.filters import threshold_sauvola, threshold_otsu
 from skimage.transform import rotate
 
-from .tools.peakdetect import *
+from Preprocess.tools.peakdetect import *
 
 matplotlib.rcParams['font.size'] = 9
 
@@ -49,22 +49,81 @@ def binariseOtsu(image):
 
 def writeImage(image, filename):
     path_output = os.path.abspath(filename)
+    image = image.astype(np.uint8)
     imsave(fname=path_output,arr=image)
 
 
 # def getMainComponent(labeled_img_with_stats)
 #     return ''
 
-def getOptimumRotation(image, outputDirectory="Output"):
-    rotDegree = 0
-    for degree in range (-10, 10):
-        rotatedImage = rotate (image, degree)
-        writeImage(rotatedImage, outputDirectory+"/degree="+str(degree)+".jpg")
+def getOptimumRotation(image, outputDirectory='Output/rotated', lookahead=30, minDegree=-10, maxDegree=10):
+    optimumRotDegree = 0
+    optimumScore = 0
+    optimumRotImage = image
+    for degree in range (minDegree, maxDegree):
 
-        # Create a model to quantify rotated images to determine the optimum one.
+        rotatedImage = rotate(image, degree, resize=False, cval=1, mode ='constant')
+        
+        # Rotate results in a normalised floating image -> convert it to uint8
+        rotatedImage = rotatedImage * 255
+        rotatedImage = rotatedImage.astype(np.uint8)
+        writeImage(rotatedImage, outputDirectory+'/rotated_' + str(degree) + '.jpg')
+
+        # 1 = column reduction.
+        # CV_REDUCE_AVG instead of sum, because we want the normalized number of pixels
+        histogram = cv2.reduce(rotatedImage, 1, cv2.REDUCE_AVG)
+        # Transpose column vector into row vector
+        histogram = histogram.reshape(-1)
+
+        plt.plot(histogram)
+        plt.title('Degree=' + str(degree))
+        plt.savefig(outputDirectory+'/histogram_' + str(degree) + '.jpg')
+        plt.clf()
+
+        line_peaks = peakdetect(histogram, lookahead=lookahead)
+
+        # Note: It is expected that the algorithm will give an equal number
+        # of positive and negative peaks.
+        numberPeaks = len(line_peaks[0])
+        for peak in range(0, numberPeaks):
+            score = line_peaks[0][peak][1] - line_peaks[1][peak][1]
+        score = score / numberPeaks
+
+        print ('Degree=' + str(degree) + '; Score=' + str(score))
+
+        if score > optimumScore:
+            optimumScore = score
+            optimumRotDegree = degree
+            optimumRotImage = rotatedImage
 
 
-    return rotatedImage, rotDegree
+    return optimumRotImage, optimumRotDegree
+
+
+# Rotate image with border. Credit:
+# https://www.pyimagesearch.com/2017/01/02/rotate-images-correctly-with-opencv-and-python/
+def rotate_bound(image, angle):
+    # grab the dimensions of the image and then determine the center
+    (h, w) = image.shape[:2]
+    (cX, cY) = (w // 2, h // 2)
+ 
+    # grab the rotation matrix (applying the negative of the
+    # angle to rotate clockwise), then grab the sine and cosine
+    # (i.e., the rotation components of the matrix)
+    M = cv2.getRotationMatrix2D((cX, cY), -angle, 1.0)
+    cos = np.abs(M[0, 0])
+    sin = np.abs(M[0, 1])
+ 
+    # compute the new bounding dimensions of the image
+    nW = int((h * sin) + (w * cos))
+    nH = int((h * cos) + (w * sin))
+ 
+    # adjust the rotation matrix to take into account translation
+    M[0, 2] += (nW / 2) - cX
+    M[1, 2] += (nH / 2) - cY
+ 
+    # perform the actual rotation and return the image
+    return cv2.warpAffine(image, M, (nW, nH))
 
 
 # def trimImage(rotatedImage, blanks_allowed=10)
@@ -90,21 +149,21 @@ def preprocess(inputImageName, outputDirectory):
     writeImage(binarisedOtsu, outputDirectory+"/binarisedOtsu.jpg")
 
 
-    # Get the connected componenets
+    # Get the connected componenets. Get a feeling of how the connection is done.
     # Credit: https://stackoverflow.com/questions/46441893/connected-component-labeling-in-python
     ret, labels = cv2.connectedComponents(binarisedOtsu)
-
+    
     # Map component labels to hue val.
     label_hue = np.uint8(179 * labels / np.max(labels))
     blank_ch = 255 * np.ones_like(label_hue)
     labeled_img = cv2.merge([label_hue, blank_ch, blank_ch])
-
+    
     # cvt to BGR for display.
     labeled_img = cv2.cvtColor(labeled_img, cv2.COLOR_HSV2BGR)
-
+    
     # set bg label to black.
     labeled_img[label_hue == 0] = 0
-
+    
     writeImage(labeled_img, outputDirectory+"/labeled_otsu.jpg")
 
 
@@ -182,8 +241,7 @@ def preprocess(inputImageName, outputDirectory):
     negativeImage = 255 - negativeImage
     writeImage(negativeImage, outputDirectory+"/negativeImage2.jpg")
 
-    print(negativeImage)
-
+   
     nb_components, output, stats, centroids = cv2.connectedComponentsWithStats(negativeImage, connectivity=8)
     sizes = stats[:, -1]
     max_label = 1
@@ -242,6 +300,8 @@ def preprocess(inputImageName, outputDirectory):
 # Find optimum rotation
     rotatedImage, rotDegree = getOptimumRotation(maskedSauvola)
     print ("Optimum rotation=" + str(rotDegree))
+    writeImage(rotatedImage, outputDirectory+'/optimumRotation.jpg')
+
 
 # # Optionally, trim image from blank lines to have the main component only.
 # # (Use perhaps a blanks_allowed=10, i.e. have 10 white rows in each direction?)
