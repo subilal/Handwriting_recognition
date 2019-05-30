@@ -2,15 +2,15 @@
 
 Authors:
 
-Stefan Evanghelides - s2895323
+- Stefan Evanghelides - s2895323
 
-Huaitin Lu - s3339246
+- Huaitin Lu - s3339246
 
-Sudhakaran Jain - s3558487
+- Sudhakaran Jain - s3558487
 
-Name #4 - S#4
+- Name #4 - S#4
 
-Name #5 - S#5
+- Name #5 - S#5
 
 # General Overview
 
@@ -34,11 +34,11 @@ Installation:
 
 For preprocessing:
 
-`pipenv run python Preprocess\preprocess.py name-of-input-file name-of-output-file`
+- `pipenv run python Preprocess\preprocess.py name-of-input-file name-of-output-file`
 
 For recognition:
 
-`pipenv run Classifier\train_network.py`
+- `pipenv run Classifier\train_network.py`
 
 All together:
-`python main.py input_folder`
+- `python main.py input_folder`
