@@ -34,7 +34,10 @@ Installation:
 
 For preprocessing:
 
-- `pipenv run python Preprocess\preprocess.py name-of-input-file name-of-output-file`
+- `pipenv run python Preprocess\preprocess.py name-of-input-file name-of-output-directory`
+
+For segmentation:
+- `pipenv run python Segment\segment.py name-of-input-file name-of-output-directory`
 
 For recognition:
 
