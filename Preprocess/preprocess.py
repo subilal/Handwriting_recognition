@@ -14,15 +14,21 @@ from skimage.filters import threshold_sauvola, threshold_otsu
 from skimage.transform import rotate
 
 from Preprocess.tools.peakdetect import *
+from Utils.utils import *
 
 matplotlib.rcParams['font.size'] = 9
 
 
-def read_image(filename):
-    image = imread(filename)
+'''
+This module is intended to clear the image containing the handwriten message
+and to isolate the main component, i.e. the actual handwriting.
 
-    return image
-
+Steps:
+- image is first binarised;
+- then the main component is identified and isolated;
+- background is cleared of noise;
+- otimum rotation is determined.
+'''
 
 def constrast(image, method):
     if (method == 1): contrastedImage = adjust_gamma(image) 
@@ -47,19 +53,12 @@ def binarise_otsu(image):
     return binarised_otsu
 
 
-def write_image(image, filename):
-    path_output = os.path.abspath(filename)
-    image = image.astype(np.uint8)
-    imsave(fname=path_output,arr=image)
-
-
-# def getMainComponent(labeled_img_with_stats)
-#     return ''
-
 def get_optimum_rotation(image, output_directory='Output/rotated', lookahead=30, min_degree=-10, max_degree=10):
     optimum_rot_degree = 0
     optimum_score = 0
     optimum_rot_image = image
+    optimum_rot_line_peaks = []
+
     for degree in range (min_degree, max_degree):
 
         rotated_image = rotate(image, degree, resize=False, cval=1, mode ='constant')
@@ -89,15 +88,15 @@ def get_optimum_rotation(image, output_directory='Output/rotated', lookahead=30,
             score = line_peaks[0][peak][1] - line_peaks[1][peak][1]
         score = score / number_peaks
 
-        print ('Degree=' + str(degree) + '; Score=' + str(score))
+        # print ('Degree=' + str(degree) + '; Score=' + str(score))
 
         if score > optimum_score:
             optimum_score = score
             optimum_rot_degree = degree
             optimum_rot_image = rotated_image
+            optimum_rot_line_peaks = line_peaks
 
-
-    return optimum_rot_image, optimum_rot_degree
+    return optimum_rot_image, optimum_rot_line_peaks, optimum_rot_degree
 
 
 # Rotate image with border. Credit:
@@ -124,10 +123,6 @@ def rotate_bound(image, angle):
  
     # perform the actual rotation and return the image
     return cv2.warpAffine(image, M, (nW, nH))
-
-
-# def trimImage(rotatedImage, blanks_allowed=10)
-#     return ''
 
 
 ####### Main ########
@@ -298,26 +293,13 @@ def preprocess(input_image_name, output_directory):
 
 
 # Find optimum rotation
-    rotated_image, rot_degree = get_optimum_rotation(masked_sauvola)
-    print ("Optimum rotation=" + str(rot_degree))
-    write_image(rotated_image, output_directory+'/optimumRotation.jpg')
+    rot_image, rot_line_peaks, rot_degree = get_optimum_rotation(masked_sauvola)
 
 
 # # Optionally, trim image from blank lines to have the main component only.
 # # (Use perhaps a blanks_allowed=10, i.e. have 10 white rows in each direction?)
 #     preprocessedImage = trimImage(rotatedImage, blanks_allowed=10)
     
-
-
-# Now we want to segment the image
-# TODO: segmentation.
-
-
     print ("Preprocessing successful!")
 
-###########################################
-
-if __name__ == "__main__":
-    input_image_name = sys.argv[1]
-    output_directory = sys.argv[2]
-    preprocess(input_image_name, output_directory)
+    return rot_image, rot_line_peaks, rot_degree
