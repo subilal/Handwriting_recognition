@@ -5,11 +5,8 @@ from Segment.segment import *
 
 
 # First, preprocess images.
-input_image = "Input/P168-Fg016-R-C01-R01-fused.jpg"
+input_image_name = "Input/P168-Fg016-R-C01-R01-fused.jpg"
 output_directory = "Output"
-preprocess(input_image,output_directory)
 
-# Second, segment images.
-input_image = "Output/optimumRotation.jpg"
-output_directory = "Output/segmented"
-segment(input_image,output_directory)
+rot_image, rot_line_peaks, rot_degree = preprocess(input_image_name, output_directory)
+segment(rot_image, rot_line_peaks, output_directory)

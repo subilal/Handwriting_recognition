@@ -15,6 +15,8 @@ print ("Optimum rotation=" + str(rot_degree))
 print ("Optimum line peaks=\n" + str(rot_line_peaks))
 write_image(rot_image, output_directory+'/optimumRotation.jpg')
 write_line_peaks(rot_line_peaks, output_directory+'/line_peaks')
+
+write_image(rot_image, output_directory_for_segmentation+'/image.jpg')
 write_line_peaks(rot_line_peaks, output_directory_for_segmentation+'/line_peaks')
 
 print ("Main Preprocessing successful")
