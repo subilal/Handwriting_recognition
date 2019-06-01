@@ -37,3 +37,10 @@ def write_image(image, filename):
 def write_line_peaks(line_peaks, filename):
     path_output = os.path.abspath(filename)
     np.savez(filename, line_peaks0=line_peaks[0], line_peaks1=line_peaks[1])
+
+# Filesystem
+
+def ensure_directory (directory):
+    directory =  os.path.abspath(directory)
+    if not os.path.exists(directory):
+        os.mkdir(directory)

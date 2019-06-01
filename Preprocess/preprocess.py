@@ -53,7 +53,7 @@ def binarise_otsu(image):
     return binarised_otsu
 
 
-def get_optimum_rotation(image, output_directory='Output/rotated', lookahead=30, min_degree=-10, max_degree=10):
+def get_optimum_rotation(image, output_directory, lookahead=30, min_degree=-10, max_degree=10):
     optimum_rot_degree = 0
     optimum_score = 0
     optimum_rot_image = image
@@ -293,7 +293,9 @@ def preprocess(input_image_name, output_directory):
 
 
 # Find optimum rotation
-    rot_image, rot_line_peaks, rot_degree = get_optimum_rotation(masked_sauvola)
+    rotation_directory = output_directory + '/rotated'
+    ensure_directory(rotation_directory)
+    rot_image, rot_line_peaks, rot_degree = get_optimum_rotation(masked_sauvola, rotation_directory)
 
 
 # # Optionally, trim image from blank lines to have the main component only.
