@@ -28,21 +28,20 @@ for image_name in files:
     print ("Processing image " + image)
 
     image_name_base = os.path.splitext(image)[0]
-    output_directory = os.path.abspath(os.path.join(output_directory, image_name_base))
+    output_image_directory = os.path.abspath(os.path.join(output_directory, image_name_base))
 
-    remove_directory(output_directory)
-    ensure_directory(output_directory)
+    remove_directory(output_image_directory)
+    ensure_directory(output_image_directory)
 
-    rot_image, rot_line_peaks, rot_degree = preprocess(image_name, output_directory, debug=debug)
+    rot_image, rot_line_peaks, rot_degree = preprocess(image_name, output_image_directory, debug=debug)
 
-    write_image(rot_image, output_directory+"/OptimumRotation="+str(rot_degree)+".jpg", debug)
+    write_image(rot_image, output_image_directory+"/OptimumRotation="+str(rot_degree)+".jpg", debug)
     
     print ("Finished preprocessing " + image)
     print ("    ****    ")
     print ("Segmenting image " + image)
     
-    segment(rot_image, rot_line_peaks, output_directory, debug=debug)
+    segment(rot_image, rot_line_peaks, output_image_directory, debug=debug)
 
     print ("Finished Segmenting image " + image)
     print ("--------------------------------------------")
-    break
