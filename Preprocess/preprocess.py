@@ -13,8 +13,9 @@ from skimage.io import imread, imsave, imshow
 from skimage.filters import threshold_sauvola, threshold_otsu
 from skimage.transform import rotate
 
-from Preprocess.tools.peakdetect import *
-from Utils.utils import *
+from Utils.peakdetect import *
+from Utils.io import *
+from Utils.filesystem import *
 
 matplotlib.rcParams['font.size'] = 9
 
@@ -294,6 +295,7 @@ def preprocess(input_image_name, output_directory):
 
 # Find optimum rotation
     rotation_directory = output_directory + '/rotated'
+    remove_directory(rotation_directory)
     ensure_directory(rotation_directory)
     lookahead = 20
     rot_image, rot_line_peaks, rot_degree = get_optimum_rotation(masked_sauvola, rotation_directory, lookahead = lookahead)
