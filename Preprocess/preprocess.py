@@ -33,8 +33,8 @@ Steps:
 '''
 
 def constrast(image, method):
-    if (method == 1): contrastedImage = adjust_gamma(image) 
-    if (method == 2): contrastedImage = adjust_log(image)
+    if method == 1: contrastedImage = adjust_gamma(image) 
+    if method == 2: contrastedImage = adjust_log(image)
 
     return contrasted_image
 
@@ -90,7 +90,8 @@ def get_optimum_rotation(image, output_directory, lookahead=30, min_degree=-10, 
             score = line_peaks[0][peak][1] - line_peaks[1][peak][1]
         score = score / number_peaks
 
-        print ('Degree=' + str(degree) + '; Score=' + str(score))
+        if debug:
+            print ('Degree=' + str(degree) + '; Score=' + str(score))
 
         if score >= optimum_score and abs(degree) <= abs(optimum_rot_degree):
             optimum_score = score
@@ -234,7 +235,7 @@ def preprocess(input_image_name, output_directory, debug=False):
 
 
     # Fifth attempt: negative Otsu based on labeled Otsu with stats.
-    if (not debug):
+    if not debug:
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             negative_image = img_as_ubyte(labeled_img_with_stats / 255)
@@ -264,7 +265,7 @@ def preprocess(input_image_name, output_directory, debug=False):
     # Mask image 1: using labeled Otsu + negative labeled Otsu
     masked_otsu = labeled_img_with_stats
 
-    if (not debug):
+    if not debug:
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             labeled_img_with_stats3 = img_as_ubyte(labeled_img_with_stats3 / 255)

@@ -32,7 +32,7 @@ def read_line_peaks(filename):
 def write_image(image, filename, debug=False):
     path_output = os.path.abspath(filename)
     image = image.astype(np.uint8)
-    if (not debug):
+    if not debug:
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             imsave(fname=path_output,arr=image)

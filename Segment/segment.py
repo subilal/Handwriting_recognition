@@ -40,10 +40,11 @@ def segment_image_into_lines(image, line_peaks, output_directory, debug=False):
     lines = []
     height = image.shape[0]
 
-    if (not line_peaks[0] and not line_peaks[1]):
-        print ('Line_peaks is empty')
+    if not line_peaks[0] and not line_peaks[1]:
+        if debug:
+            print ('Line_peaks is empty')
         return words
-    elif (line_peaks[0]):
+    elif line_peaks[0]:
         for peak in line_peaks[0]:
             rows.append(peak[0])
 
@@ -76,10 +77,11 @@ def segment_line_into_words(line_image, line_idx, word_peaks, output_directory, 
     height = line_image.shape[0]
     width = line_image.shape[1]
 
-    if (not word_peaks[0] and not word_peaks[1]):
-        print ('Word_peaks is empty for line ' + str(line_idx))
+    if not word_peaks[0] and not word_peaks[1]:
+        if debug:
+            print ('Word_peaks is empty for line ' + str(line_idx))
         return words
-    elif (word_peaks[0]):
+    elif word_peaks[0]:
         for peak in word_peaks[0]:
             cols.append(peak[0])
         
@@ -113,8 +115,6 @@ def segment(image, line_peaks, output_directory, debug=False):
     lines_directory = output_directory + '/lines'
     lines = segment_image_into_lines(image, line_peaks, lines_directory, debug)
 
-    print ("Lines created!")
-
     line_idx = 0
     for line in lines:
         line_histogram = cv2.reduce(line, 0, cv2.REDUCE_AVG)
@@ -134,7 +134,9 @@ def segment(image, line_peaks, output_directory, debug=False):
         ensure_directory(words_directory)
 
         words = segment_line_into_words(line, line_idx, word_peaks, words_directory, debug)
-        print ("Words for line " + str(line_idx) + " created!")
+        
+        if debug:
+            print ("Words for line " + str(line_idx) + " created!")
 
         line_idx = line_idx + 1
 
