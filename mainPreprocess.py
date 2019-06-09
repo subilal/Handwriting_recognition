@@ -9,7 +9,7 @@ input_image_name = "TestInputPreprocess/image.jpg"
 output_directory = "TestOutputPreprocess"
 output_directory_for_segmentation = "TestInputSegment"
 
-rot_image, rot_line_peaks, rot_degree = preprocess(input_image_name, output_directory)
+rot_image, rot_line_peaks, rot_degree = preprocess(input_image_name, output_directory, debug=True)
 
 print ("Optimum rotation=" + str(rot_degree))
 print ("Optimum line peaks=\n" + str(rot_line_peaks))

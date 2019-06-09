@@ -1,6 +1,7 @@
 import sys, os
 
 import numpy as np
+import warnings
 
 from skimage.io import imread, imsave
 
@@ -28,10 +29,15 @@ def read_line_peaks(filename):
 
 # Writing
 
-def write_image(image, filename):
+def write_image(image, filename, debug=False):
     path_output = os.path.abspath(filename)
     image = image.astype(np.uint8)
-    imsave(fname=path_output,arr=image)
+    if (not debug):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            imsave(fname=path_output,arr=image)
+    else:
+        imsave(fname=path_output,arr=image)
 
 def write_line_peaks(line_peaks, filename):
     path_output = os.path.abspath(filename)

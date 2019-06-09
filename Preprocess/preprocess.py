@@ -6,6 +6,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 
 import numpy as np
+import warnings
 
 from skimage import img_as_float, img_as_ubyte
 from skimage.exposure import adjust_gamma, adjust_log
@@ -54,7 +55,7 @@ def binarise_otsu(image):
     return binarised_otsu
 
 
-def get_optimum_rotation(image, output_directory, lookahead=30, min_degree=-10, max_degree=10):
+def get_optimum_rotation(image, output_directory, lookahead=30, min_degree=-10, max_degree=10, debug=False):
     optimum_rot_degree = -90
     optimum_score = 0
     optimum_rot_image = image
@@ -67,7 +68,7 @@ def get_optimum_rotation(image, output_directory, lookahead=30, min_degree=-10, 
         # Rotate results in a normalised floating image -> convert it to uint8
         rotated_image = rotated_image * 255
         rotated_image = rotated_image.astype(np.uint8)
-        write_image(rotated_image, output_directory+'/rotated_' + str(degree) + '.jpg')
+        write_image(rotated_image, output_directory+'/rotated_' + str(degree) + '.jpg', debug)
 
         # 1 = column reduction.
         # CV_REDUCE_AVG instead of sum, because we want the normalized number of pixels
@@ -129,7 +130,7 @@ def rotate_bound(image, angle):
 ####### Main ########
 #####################
 
-def preprocess(input_image_name, output_directory):
+def preprocess(input_image_name, output_directory, debug=False):
     # Read image.
     input_image = read_image(input_image_name)
 
@@ -141,8 +142,8 @@ def preprocess(input_image_name, output_directory):
     binarised_otsu = binarise_otsu(input_image)
 
     # Save binarised images.
-    write_image(binarised_sauvola, output_directory+"/binarisedSauvola.jpg")
-    write_image(binarised_otsu, output_directory+"/binarisedOtsu.jpg")
+    write_image(binarised_sauvola, output_directory+"/binarisedSauvola.jpg", debug)
+    write_image(binarised_otsu, output_directory+"/binarisedOtsu.jpg", debug)
 
 
     # Get the connected componenets. Get a feeling of how the connection is done.
@@ -160,7 +161,7 @@ def preprocess(input_image_name, output_directory):
     # set bg label to black.
     labeled_img[label_hue == 0] = 0
     
-    write_image(labeled_img, output_directory+"/labeled_otsu.jpg")
+    write_image(labeled_img, output_directory+"/labeled_otsu.jpg", debug)
 
 
     # First attempt, Otsu with connectivity 4:
@@ -175,7 +176,7 @@ def preprocess(input_image_name, output_directory):
     labeled_img_with_stats = np.zeros(output.shape)
     labeled_img_with_stats[output == max_label] = 255
 
-    write_image(labeled_img_with_stats, output_directory+"/labeled_otsu_with_stats.jpg")
+    write_image(labeled_img_with_stats, output_directory+"/labeled_otsu_with_stats.jpg", debug)
 
 
 # Note: Connectivity 4 is better because, because this results in a better component,
@@ -194,7 +195,7 @@ def preprocess(input_image_name, output_directory):
     # labeled_img_with_stats = np.zeros(output.shape)
     # labeled_img_with_stats[output == max_label] = 255
 
-    # write_image(labeled_img_with_stats, output_directory+"/labeled_otsu_with_stats_2.jpg")
+    # write_image(labeled_img_with_stats, output_directory+"/labeled_otsu_with_stats_2.jpg", debug)
 
 
 
@@ -210,7 +211,7 @@ def preprocess(input_image_name, output_directory):
     labeled_img_with_stats2 = np.zeros(output.shape)
     labeled_img_with_stats2[output == max_label] = 255
 
-    write_image(labeled_img_with_stats2, output_directory+"/labeled_sauvola_with_stats.jpg")
+    write_image(labeled_img_with_stats2, output_directory+"/labeled_sauvola_with_stats.jpg", debug)
 
 
 
@@ -226,16 +227,22 @@ def preprocess(input_image_name, output_directory):
     # labeled_img_with_stats2 = np.zeros(output.shape)
     # labeled_img_with_stats2[output == max_label] = 255
 
-    # write_image(labeled_img_with_stats2, output_directory+"/labeled_sauvola_with_stats_2.jpg")
+    # write_image(labeled_img_with_stats2, output_directory+"/labeled_sauvola_with_stats_2.jpg", debug)
 
 
 
 
 
     # Fifth attempt: negative Otsu based on labeled Otsu with stats.
-    negative_image = img_as_ubyte(labeled_img_with_stats / 255)
+    if (not debug):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            negative_image = img_as_ubyte(labeled_img_with_stats / 255)
+    else:
+        negative_image = img_as_ubyte(labeled_img_with_stats / 255)
+
     negative_image = 255 - negative_image
-    write_image(negative_image, output_directory+"/negativeImage2.jpg")
+    write_image(negative_image, output_directory+"/negativeImage2.jpg", debug)
 
    
     nb_components, output, stats, centroids = cv2.connectedComponentsWithStats(negative_image, connectivity=8)
@@ -249,17 +256,23 @@ def preprocess(input_image_name, output_directory):
     labeled_img_with_stats3 = np.zeros(output.shape)
     labeled_img_with_stats3[output == max_label] = 255
 
-    write_image(labeled_img_with_stats3, output_directory+"/labeled_otsu_negative.jpg")
+    write_image(labeled_img_with_stats3, output_directory+"/labeled_otsu_negative.jpg", debug)
 
 
 
 
     # Mask image 1: using labeled Otsu + negative labeled Otsu
     masked_otsu = labeled_img_with_stats
-    labeled_img_with_stats3 = img_as_ubyte(labeled_img_with_stats3 / 255)
-    masked_otsu[labeled_img_with_stats3 == 255] = 255
 
-    write_image(masked_otsu, output_directory+"/maskedOtsu.jpg")
+    if (not debug):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            labeled_img_with_stats3 = img_as_ubyte(labeled_img_with_stats3 / 255)
+    else:
+       labeled_img_with_stats3 = img_as_ubyte(labeled_img_with_stats3 / 255)
+
+    masked_otsu[labeled_img_with_stats3 == 255] = 255
+    write_image(masked_otsu, output_directory+"/maskedOtsu.jpg", debug)
 
 
 
@@ -267,7 +280,7 @@ def preprocess(input_image_name, output_directory):
     masked_sauvola = binarised_sauvola
     masked_sauvola[labeled_img_with_stats3 == 255] = 255
 
-    write_image(masked_sauvola, output_directory+"/maskedSauvola.jpg")
+    write_image(masked_sauvola, output_directory+"/maskedSauvola.jpg", debug)
 
 
     # Mask image 3: different Sauvola binary
@@ -275,13 +288,13 @@ def preprocess(input_image_name, output_directory):
     k = 0.5 # This is optional parameter
     r = 128 # This is optional parameter
     binarised_sauvola_2 = binarise_sauvola(input_image, window_size=window_size, k=k, r=r)
-    write_image(binarised_sauvola_2, output_directory+"/binarisedSauvola2.jpg")
+    write_image(binarised_sauvola_2, output_directory+"/binarisedSauvola2.jpg", debug)
     
 
     masked_sauvola = binarised_sauvola_2
     masked_sauvola[labeled_img_with_stats3 == 255] = 255
 
-    write_image(masked_sauvola, output_directory+"/maskedSauvola2.jpg")
+    write_image(masked_sauvola, output_directory+"/maskedSauvola2.jpg", debug)
 
 
 # So far, we isolated the image, the optimal parameters (currently) are:

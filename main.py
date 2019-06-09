@@ -3,7 +3,6 @@ import sys, os
 from Preprocess.preprocess import *
 from Segment.segment import *
 
-
 # First, preprocess images.
 input_image_name = "Input/P168-Fg016-R-C01-R01-fused.jpg"
 output_directory = "Output"
