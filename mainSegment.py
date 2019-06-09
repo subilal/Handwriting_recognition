@@ -12,6 +12,12 @@ output_directory = "TestOutputSegment"
 image = read_image (input_image_name)
 line_peaks = read_line_peaks (input_line_peaks)
 
+print ("")
+print ("Segmenting image " + input_image_name)
+print ("")
+
 segment(image, line_peaks, output_directory, debug=True)
 
-print ('Main Segmentation successful')
+print ("")
+print ("Finished Segmenting image " + input_image_name)
+print ("--------------------------------------------")

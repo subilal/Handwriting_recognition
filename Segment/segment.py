@@ -139,5 +139,3 @@ def segment(image, line_peaks, output_directory, debug=False):
             print ("Words for line " + str(line_idx) + " created!")
 
         line_idx = line_idx + 1
-
-    print ("Segmentation successful!")

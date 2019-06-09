@@ -312,13 +312,11 @@ def preprocess(input_image_name, output_directory, debug=False):
     remove_directory(rotation_directory)
     ensure_directory(rotation_directory)
     lookahead = 20
-    rot_image, rot_line_peaks, rot_degree = get_optimum_rotation(masked_sauvola, rotation_directory, lookahead = lookahead)
+    rot_image, rot_line_peaks, rot_degree = get_optimum_rotation(masked_sauvola, rotation_directory, lookahead = lookahead, debug=debug)
 
 
 # # Optionally, trim image from blank lines to have the main component only.
 # # (Use perhaps a blanks_allowed=10, i.e. have 10 white rows in each direction?)
 #     preprocessedImage = trimImage(rotatedImage, blanks_allowed=10)
-    
-    print ("Preprocessing successful!")
 
     return rot_image, rot_line_peaks, rot_degree
