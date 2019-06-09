@@ -55,7 +55,7 @@ def binarise_otsu(image):
     return binarised_otsu
 
 
-def get_optimum_rotation(image, output_directory, lookahead=30, min_degree=-10, max_degree=10, debug=False):
+def get_optimum_rotation(image, output_directory, lookahead=30, min_degree=-10, max_degree=10, runmode=1):
     optimum_rot_degree = -90
     optimum_score = 0
     optimum_rot_image = image
@@ -68,7 +68,9 @@ def get_optimum_rotation(image, output_directory, lookahead=30, min_degree=-10, 
         # Rotate results in a normalised floating image -> convert it to uint8
         rotated_image = rotated_image * 255
         rotated_image = rotated_image.astype(np.uint8)
-        write_image(rotated_image, output_directory+'/rotated_' + str(degree) + '.jpg', debug)
+        
+        if runmode > 0: # Show intermediary rotated images in normal and debug mode
+            write_image(rotated_image, output_directory+'/rotated_' + str(degree) + '.jpg', runmode=runmode)
 
         # 1 = column reduction.
         # CV_REDUCE_AVG instead of sum, because we want the normalized number of pixels
@@ -76,10 +78,11 @@ def get_optimum_rotation(image, output_directory, lookahead=30, min_degree=-10, 
         # Transpose column vector into row vector
         histogram = histogram.reshape(-1)
 
-        plt.plot(histogram)
-        plt.title('Degree=' + str(degree))
-        plt.savefig(output_directory+'/histogram_' + str(degree) + '.jpg')
-        plt.clf()
+        if (runmode > 0): # Show intermediary histograms in normal and debug mode
+            plt.plot(histogram)
+            plt.title('Degree=' + str(degree))
+            plt.savefig(output_directory+'/histogram_' + str(degree) + '.jpg')
+            plt.clf()
 
         line_peaks = peakdetect(histogram, lookahead=lookahead)
 
@@ -90,7 +93,7 @@ def get_optimum_rotation(image, output_directory, lookahead=30, min_degree=-10, 
             score = line_peaks[0][peak][1] - line_peaks[1][peak][1]
         score = score / number_peaks
 
-        if debug:
+        if runmode > 1: # Show tested degrees in debug mode only
             print ('Degree=' + str(degree) + '; Score=' + str(score))
 
         if score >= optimum_score and abs(degree) <= abs(optimum_rot_degree):
@@ -102,36 +105,10 @@ def get_optimum_rotation(image, output_directory, lookahead=30, min_degree=-10, 
     return optimum_rot_image, optimum_rot_line_peaks, optimum_rot_degree
 
 
-# Rotate image with border. Credit:
-# https://www.pyimagesearch.com/2017/01/02/rotate-images-correctly-with-opencv-and-python/
-def rotate_bound(image, angle):
-    # grab the dimensions of the image and then determine the center
-    (h, w) = image.shape[:2]
-    (cX, cY) = (w // 2, h // 2)
- 
-    # grab the rotation matrix (applying the negative of the
-    # angle to rotate clockwise), then grab the sine and cosine
-    # (i.e., the rotation components of the matrix)
-    M = cv2.getRotationMatrix2D((cX, cY), -angle, 1.0)
-    cos = np.abs(M[0, 0])
-    sin = np.abs(M[0, 1])
- 
-    # compute the new bounding dimensions of the image
-    nW = int((h * sin) + (w * cos))
-    nH = int((h * cos) + (w * sin))
- 
-    # adjust the rotation matrix to take into account translation
-    M[0, 2] += (nW / 2) - cX
-    M[1, 2] += (nH / 2) - cY
- 
-    # perform the actual rotation and return the image
-    return cv2.warpAffine(image, M, (nW, nH))
-
-
 ####### Main ########
 #####################
 
-def preprocess(input_image_name, output_directory, debug=False):
+def preprocess(input_image_name, output_directory, runmode=1):
     # Read image.
     input_image = read_image(input_image_name)
 
@@ -143,8 +120,8 @@ def preprocess(input_image_name, output_directory, debug=False):
     binarised_otsu = binarise_otsu(input_image)
 
     # Save binarised images.
-    write_image(binarised_sauvola, output_directory+"/binarisedSauvola.jpg", debug)
-    write_image(binarised_otsu, output_directory+"/binarisedOtsu.jpg", debug)
+    write_image(binarised_sauvola, output_directory+"/binarisedSauvola.jpg", runmode=runmode)
+    write_image(binarised_otsu, output_directory+"/binarisedOtsu.jpg", runmode=runmode)
 
 
     # Get the connected componenets. Get a feeling of how the connection is done.
@@ -162,7 +139,7 @@ def preprocess(input_image_name, output_directory, debug=False):
     # set bg label to black.
     labeled_img[label_hue == 0] = 0
     
-    write_image(labeled_img, output_directory+"/labeled_otsu.jpg", debug)
+    write_image(labeled_img, output_directory+"/labeled_otsu.jpg", runmode=runmode)
 
 
     # First attempt, Otsu with connectivity 4:
@@ -177,7 +154,7 @@ def preprocess(input_image_name, output_directory, debug=False):
     labeled_img_with_stats = np.zeros(output.shape)
     labeled_img_with_stats[output == max_label] = 255
 
-    write_image(labeled_img_with_stats, output_directory+"/labeled_otsu_with_stats.jpg", debug)
+    write_image(labeled_img_with_stats, output_directory+"/labeled_otsu_with_stats.jpg", runmode=runmode)
 
 
 # Note: Connectivity 4 is better because, because this results in a better component,
@@ -196,7 +173,7 @@ def preprocess(input_image_name, output_directory, debug=False):
     # labeled_img_with_stats = np.zeros(output.shape)
     # labeled_img_with_stats[output == max_label] = 255
 
-    # write_image(labeled_img_with_stats, output_directory+"/labeled_otsu_with_stats_2.jpg", debug)
+    # write_image(labeled_img_with_stats, output_directory+"/labeled_otsu_with_stats_2.jpg", runmode=runmode)
 
 
 
@@ -212,7 +189,7 @@ def preprocess(input_image_name, output_directory, debug=False):
     labeled_img_with_stats2 = np.zeros(output.shape)
     labeled_img_with_stats2[output == max_label] = 255
 
-    write_image(labeled_img_with_stats2, output_directory+"/labeled_sauvola_with_stats.jpg", debug)
+    write_image(labeled_img_with_stats2, output_directory+"/labeled_sauvola_with_stats.jpg", runmode=runmode)
 
 
 
@@ -228,14 +205,14 @@ def preprocess(input_image_name, output_directory, debug=False):
     # labeled_img_with_stats2 = np.zeros(output.shape)
     # labeled_img_with_stats2[output == max_label] = 255
 
-    # write_image(labeled_img_with_stats2, output_directory+"/labeled_sauvola_with_stats_2.jpg", debug)
+    # write_image(labeled_img_with_stats2, output_directory+"/labeled_sauvola_with_stats_2.jpg", runmode=runmode)
 
 
 
 
 
     # Fifth attempt: negative Otsu based on labeled Otsu with stats.
-    if not debug:
+    if runmode < 2: # Surpress the errors if program is not in debug mode
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             negative_image = img_as_ubyte(labeled_img_with_stats / 255)
@@ -243,7 +220,7 @@ def preprocess(input_image_name, output_directory, debug=False):
         negative_image = img_as_ubyte(labeled_img_with_stats / 255)
 
     negative_image = 255 - negative_image
-    write_image(negative_image, output_directory+"/negativeImage2.jpg", debug)
+    write_image(negative_image, output_directory+"/negativeImage2.jpg", runmode=runmode)
 
    
     nb_components, output, stats, centroids = cv2.connectedComponentsWithStats(negative_image, connectivity=8)
@@ -257,7 +234,7 @@ def preprocess(input_image_name, output_directory, debug=False):
     labeled_img_with_stats3 = np.zeros(output.shape)
     labeled_img_with_stats3[output == max_label] = 255
 
-    write_image(labeled_img_with_stats3, output_directory+"/labeled_otsu_negative.jpg", debug)
+    write_image(labeled_img_with_stats3, output_directory+"/labeled_otsu_negative.jpg", runmode=runmode)
 
 
 
@@ -265,7 +242,7 @@ def preprocess(input_image_name, output_directory, debug=False):
     # Mask image 1: using labeled Otsu + negative labeled Otsu
     masked_otsu = labeled_img_with_stats
 
-    if not debug:
+    if runmode < 2: # Surpress the errors if program is not in debug mode
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             labeled_img_with_stats3 = img_as_ubyte(labeled_img_with_stats3 / 255)
@@ -273,7 +250,7 @@ def preprocess(input_image_name, output_directory, debug=False):
        labeled_img_with_stats3 = img_as_ubyte(labeled_img_with_stats3 / 255)
 
     masked_otsu[labeled_img_with_stats3 == 255] = 255
-    write_image(masked_otsu, output_directory+"/maskedOtsu.jpg", debug)
+    write_image(masked_otsu, output_directory+"/maskedOtsu.jpg", runmode=runmode)
 
 
 
@@ -281,7 +258,7 @@ def preprocess(input_image_name, output_directory, debug=False):
     masked_sauvola = binarised_sauvola
     masked_sauvola[labeled_img_with_stats3 == 255] = 255
 
-    write_image(masked_sauvola, output_directory+"/maskedSauvola.jpg", debug)
+    write_image(masked_sauvola, output_directory+"/maskedSauvola.jpg", runmode=runmode)
 
 
     # Mask image 3: different Sauvola binary
@@ -289,13 +266,13 @@ def preprocess(input_image_name, output_directory, debug=False):
     k = 0.5 # This is optional parameter
     r = 128 # This is optional parameter
     binarised_sauvola_2 = binarise_sauvola(input_image, window_size=window_size, k=k, r=r)
-    write_image(binarised_sauvola_2, output_directory+"/binarisedSauvola2.jpg", debug)
+    write_image(binarised_sauvola_2, output_directory+"/binarisedSauvola2.jpg", runmode=runmode)
     
 
     masked_sauvola = binarised_sauvola_2
     masked_sauvola[labeled_img_with_stats3 == 255] = 255
 
-    write_image(masked_sauvola, output_directory+"/maskedSauvola2.jpg", debug)
+    write_image(masked_sauvola, output_directory+"/maskedSauvola2.jpg", runmode=runmode)
 
 
 # So far, we isolated the image, the optimal parameters (currently) are:
@@ -312,7 +289,7 @@ def preprocess(input_image_name, output_directory, debug=False):
     remove_directory(rotation_directory)
     ensure_directory(rotation_directory)
     lookahead = 20
-    rot_image, rot_line_peaks, rot_degree = get_optimum_rotation(masked_sauvola, rotation_directory, lookahead = lookahead, debug=debug)
+    rot_image, rot_line_peaks, rot_degree = get_optimum_rotation(masked_sauvola, rotation_directory, lookahead = lookahead, runmode=runmode)
 
 
 # # Optionally, trim image from blank lines to have the main component only.

@@ -35,13 +35,13 @@ Both methods make use of the peakdetect method.
 - image is optimally rotated.
 '''
 
-def segment_image_into_lines(image, line_peaks, output_directory, debug=False):
+def segment_image_into_lines(image, line_peaks, output_directory, runmode=1):
     rows = []
     lines = []
     height = image.shape[0]
 
     if not line_peaks[0] and not line_peaks[1]:
-        if debug:
+        if runmode > 1:
             print ('Line_peaks is empty')
         return words
     elif line_peaks[0]:
@@ -57,7 +57,7 @@ def segment_image_into_lines(image, line_peaks, output_directory, debug=False):
 
     remove_directory(output_directory)
     ensure_directory(output_directory)
-    write_image(line, output_directory + '/line_0.jpg', debug)
+    write_image(line, output_directory + '/line_0.jpg', runmode=runmode)
 
     for idx in range (1, len(rows)):
         start = rows[idx-1]
@@ -65,12 +65,12 @@ def segment_image_into_lines(image, line_peaks, output_directory, debug=False):
         line = image[start:end]
         lines.append(line)
 
-        write_image(line, output_directory + '/line_' + str(idx) + '.jpg', debug)
+        write_image(line, output_directory + '/line_' + str(idx) + '.jpg', runmode=runmode)
 
     return lines
 
 
-def segment_line_into_words(line_image, line_idx, word_peaks, output_directory, debug=False):
+def segment_line_into_words(line_image, line_idx, word_peaks, output_directory, runmode=1):
     cols = []
     words = []
 
@@ -78,7 +78,7 @@ def segment_line_into_words(line_image, line_idx, word_peaks, output_directory, 
     width = line_image.shape[1]
 
     if not word_peaks[0] and not word_peaks[1]:
-        if debug:
+        if runmode > 1:
             print ('Word_peaks is empty for line ' + str(line_idx))
         return words
     elif word_peaks[0]:
@@ -95,7 +95,7 @@ def segment_line_into_words(line_image, line_idx, word_peaks, output_directory, 
 
     remove_directory(output_directory)
     ensure_directory(output_directory)
-    write_image(word, output_directory + '/word_0.jpg', debug)
+    write_image(word, output_directory + '/word_0.jpg', runmode=runmode)
 
     for idx in range (1, len(cols)):
         start = cols[idx-1]
@@ -103,7 +103,7 @@ def segment_line_into_words(line_image, line_idx, word_peaks, output_directory, 
         word = line_image[0:height, start:end]
         words.append(word)
 
-        write_image(word, output_directory + '/word_' + str(idx) + '.jpg', debug)
+        write_image(word, output_directory + '/word_' + str(idx) + '.jpg', runmode=runmode)
 
     return words
 
@@ -111,9 +111,9 @@ def segment_line_into_words(line_image, line_idx, word_peaks, output_directory, 
 ####### Main ########
 #####################
 
-def segment(image, line_peaks, output_directory, debug=False):
+def segment(image, line_peaks, output_directory, runmode=1):
     lines_directory = output_directory + '/lines'
-    lines = segment_image_into_lines(image, line_peaks, lines_directory, debug)
+    lines = segment_image_into_lines(image, line_peaks, lines_directory, runmode=runmode)
 
     line_idx = 0
     for line in lines:
@@ -124,18 +124,19 @@ def segment(image, line_peaks, output_directory, debug=False):
         lookahead = 30
         word_peaks = peakdetect(line_histogram, lookahead = lookahead)
 
-        plt.plot(line_histogram)
-        plt.title('Line=' + str(line_idx))
-        plt.savefig(lines_directory+'/histogram_' + str(line_idx) + '.jpg')
-        plt.clf()
+        if runmode > 1:
+            plt.plot(line_histogram)
+            plt.title('Line=' + str(line_idx))
+            plt.savefig(lines_directory+'/histogram_' + str(line_idx) + '.jpg')
+            plt.clf()
 
         words_directory = lines_directory + '/line_' + str(line_idx)
         remove_directory(words_directory)
         ensure_directory(words_directory)
 
-        words = segment_line_into_words(line, line_idx, word_peaks, words_directory, debug)
+        words = segment_line_into_words(line, line_idx, word_peaks, words_directory, runmode=runmode)
         
-        if debug:
+        if runmode > 1:
             print ("Words for line " + str(line_idx) + " created!")
 
         line_idx = line_idx + 1

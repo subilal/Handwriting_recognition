@@ -22,18 +22,16 @@ parser.add_argument("-e", "--extension", type=str, default="jpg",
 parser.add_argument("input_dir",    help="Specify the input directory")
 args = parser.parse_args()
 
-## Process parsed arguments
-#if args.debug:
-#    runmode = 2  # Show debug messages and intermediary steps
-#elif args.fast:
-#    runmode = 0  # Do not show any debug messages or intermediary steps
-#else:
-#    runmode = 1  # Default behaviour: show intermediary steps, but no debug
-debug = args.debug
-
-print ("extension=",args.extension)
-
-#print ("runmode=" + str(runmode)) 
+# Process parsed arguments
+if args.debug:
+    runmode = 2  # Show debug messages and intermediary steps
+    runmode_str = "DEBUG"
+elif args.fast:
+    runmode = 0  # Do not show any debug messages or intermediary steps
+    runmode_str = "FAST"
+else:
+    runmode = 1  # Default behaviour: show intermediary steps, but no debug
+    runmode_str = "NORMAL"
 
 # Set I/O directory names
 input_directory = os.path.abspath(args.input_dir)
@@ -53,8 +51,9 @@ ensure_directory(output_directory)
 print ("")
 print ("Processing files from the folder:")
 print ("    " + input_directory)
-print ("with extension:")
+print ("With extension:")
 print ("    " + extension)
+print ("Program running in " + runmode_str + " mode")
 print ("")
 for image_name in files:
     _, image = os.path.split(image_name)
@@ -68,15 +67,15 @@ for image_name in files:
     remove_directory(output_image_directory)
     ensure_directory(output_image_directory)
 
-    rot_image, rot_line_peaks, rot_degree = preprocess(image_name, output_image_directory, debug=debug)
+    rot_image, rot_line_peaks, rot_degree = preprocess(image_name, output_image_directory, runmode=runmode)
 
-    write_image(rot_image, output_image_directory+"/OptimumRotation="+str(rot_degree)+".jpg", debug)
+    write_image(rot_image, output_image_directory+"/OptimumRotation="+str(rot_degree)+".jpg", runmode=runmode)
     
     print ("Finished preprocessing " + image)
     print ("    ****    ")
     print ("Segmenting image " + image)
     
-    segment(rot_image, rot_line_peaks, output_image_directory, debug=debug)
+    segment(rot_image, rot_line_peaks, output_image_directory, runmode=runmode)
 
     print ("Finished Segmenting image " + image)
     print ("--------------------------------------------")
