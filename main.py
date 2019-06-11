@@ -3,6 +3,8 @@ import sys, os
 import argparse
 import glob
 
+import time
+
 from Preprocess.preprocess import *
 from Segment.segment import *
 
@@ -19,6 +21,8 @@ group.add_argument("-f", "--fast",  help="skip over intermediary results (used t
                                     action="store_true")
 parser.add_argument("-e", "--extension", type=str, default="jpg",
                                     help="specify the extension (default=.jpg)",)
+parser.add_argument("-o", "--output", type=str, default="Output",
+                                    help="specify the output directory",)
 parser.add_argument("input_dir",    help="Specify the input directory")
 args = parser.parse_args()
 
@@ -34,32 +38,35 @@ else:
     runmode_str = "NORMAL"
 
 # Set I/O directory names
-input_directory = os.path.abspath(args.input_dir)
+input_directory = args.input_dir
 extension = "*" + args.extension
-files_directory = os.path.join(input_directory, extension)
+files_directory = os.path.join(os.path.abspath(input_directory), extension)
 files = glob.glob(files_directory)
 
-output_directory = "Output" # This is a hardcoded value, but can easily be integrated in the command line args.
-remove_directory(output_directory)
-ensure_directory(output_directory)
+output_directory = args.output
+ensure_directory(output_directory) # No need to remove the output folder first
+
+times_list = []
 
 ################
 ##### Main #####
 ################
 
 # Run the program
+padding = 35
 print ("")
-print ("Processing files from the folder:")
-print ("    " + input_directory)
-print ("With extension:")
-print ("    " + extension)
-print ("Program running in " + runmode_str + " mode")
+print ("Processing files from directory:".ljust(padding) + input_directory)
+print ("With extension:".ljust(padding) + extension)
+print ("Output Directory:".ljust(padding) + output_directory)
+print ("Runmode:".ljust(padding) + runmode_str)
 print ("")
+initial_time = time.time()
 for image_name in files:
+    start_time = time.time()
     _, image = os.path.split(image_name)
     
     print ("")
-    print ("Processing image " + image)
+    print ("Processing " + image)
 
     image_name_base = os.path.splitext(image)[0]
     output_image_directory = os.path.abspath(os.path.join(output_directory, image_name_base))
@@ -67,15 +74,30 @@ for image_name in files:
     remove_directory(output_image_directory)
     ensure_directory(output_image_directory)
 
+    # Preprocess image
     rot_image, rot_line_peaks, rot_degree = preprocess(image_name, output_image_directory, runmode=runmode)
 
     write_image(rot_image, output_image_directory+"/OptimumRotation="+str(rot_degree)+".jpg", runmode=runmode)
     
     print ("Finished preprocessing " + image)
     print ("    ****    ")
-    print ("Segmenting image " + image)
+    print ("Segmenting " + image)
     
+    # Segment preprocessed image
     segment(rot_image, rot_line_peaks, output_image_directory, runmode=runmode)
 
-    print ("Finished Segmenting image " + image)
-    print ("--------------------------------------------")
+    print ("Finished Segmenting " + image)
+    print ("")
+
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print ("Elapsed time: " + str(elapsed_time))
+    print ("-" * padding)
+
+    times_list.append(elapsed_time)
+
+total_elapsed_time = end_time - initial_time
+average_time = np.average(times_list)
+print ("Total elapsed time: " + str(total_elapsed_time))
+print ("Average/image = " + str(average_time))
+print ("-" * padding)
