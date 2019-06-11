@@ -7,6 +7,7 @@ import time
 
 from Preprocess.preprocess import *
 from Segment.segment import *
+from Classifier.classifier import *
 
 #################
 ### Arguments ###
@@ -87,6 +88,16 @@ for image_name in files:
     segment(rot_image, rot_line_peaks, output_image_directory, runmode=runmode)
 
     print ("Finished Segmenting " + image)
+    print ("    ****    ")
+    print ("Classifying " + image)
+
+    # Classify segmented image
+    text = classifier (image, output_image_directory, runmode=runmode)
+
+    print ("Finished Classifying " + image)
+    print ("")
+    print ("Output:")
+    print (text)
     print ("")
 
     end_time = time.time()
