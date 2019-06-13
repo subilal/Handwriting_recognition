@@ -92,7 +92,7 @@ for image_name in files:
     print ("Classifying " + image)
 
     # Classify segmented image
-    output_path = classifier(image, output_image_directory, runmode=runmode)
+    output_path = classify(output_image_directory, runmode=runmode)
 
     print ("Finished Classifying " + image)
     print ("")

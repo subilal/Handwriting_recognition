@@ -8,15 +8,14 @@ from sklearn.model_selection import train_test_split
 import os
 from skimage import io
 import pickle
-import transcription
+import Classifier.transcription as transcription
 
 with open('./Classifier/LabelEncoder.pickle', 'rb') as f:
 	LabelEncoder = pickle.load(f)
 with open('./Classifier/OneHotEncoder.pickle', 'rb') as f:
 	OneHotEncoder = pickle.load(f)
 model = keras.models.load_model('./Classifier/trained_cnn.h5')
-stepsize = 10
-width_threshold = 12
+stepsize = 20
 
 def classify(output_directory, runmode=1):
 
