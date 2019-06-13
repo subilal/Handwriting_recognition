@@ -39,6 +39,7 @@ def write_image(image, filename, runmode=1):
     else:
         imsave(fname=path_output,arr=image)
 
+
 def write_line_peaks(line_peaks, filename):
     path_output = os.path.abspath(filename)
     np.savez(filename, line_peaks0=line_peaks[0], line_peaks1=line_peaks[1])

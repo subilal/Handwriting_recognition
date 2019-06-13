@@ -14,9 +14,10 @@ from skimage.io import imread, imsave, imshow
 from skimage.filters import threshold_sauvola, threshold_otsu
 from skimage.transform import rotate
 
-from Utils.peakdetect import *
 from Utils.io import *
 from Utils.filesystem import *
+from Utils.trim_image import *
+from Utils.peakdetect import *
 
 matplotlib.rcParams['font.size'] = 9
 
@@ -70,7 +71,7 @@ def get_optimum_rotation(image, output_directory, lookahead=30, min_degree=-10, 
         rotated_image = rotated_image.astype(np.uint8)
         
         if runmode > 0: # Show intermediary rotated images in normal and debug mode
-            write_image(rotated_image, output_directory+'/rotated_' + str(degree) + '.jpg', runmode=runmode)
+            write_image(rotated_image, output_directory + '/rotated_' + str(degree) + '.jpg', runmode=runmode)
 
         # 1 = column reduction.
         # CV_REDUCE_AVG instead of sum, because we want the normalized number of pixels
@@ -120,8 +121,8 @@ def preprocess(input_image_name, output_directory, runmode=1):
     binarised_otsu = binarise_otsu(input_image)
 
     # Save binarised images.
-    write_image(binarised_sauvola, output_directory+"/binarisedSauvola.jpg", runmode=runmode)
-    write_image(binarised_otsu, output_directory+"/binarisedOtsu.jpg", runmode=runmode)
+    write_image(binarised_sauvola, output_directory + "/binarisedSauvola.jpg", runmode=runmode)
+    write_image(binarised_otsu, output_directory + "/binarisedOtsu.jpg", runmode=runmode)
 
 
     # Get the connected componenets. Get a feeling of how the connection is done.
@@ -139,7 +140,7 @@ def preprocess(input_image_name, output_directory, runmode=1):
     # set bg label to black.
     labeled_img[label_hue == 0] = 0
     
-    write_image(labeled_img, output_directory+"/labeled_otsu.jpg", runmode=runmode)
+    write_image(labeled_img, output_directory + "/labeled_otsu.jpg", runmode=runmode)
 
 
     # First attempt, Otsu with connectivity 4:
@@ -154,7 +155,7 @@ def preprocess(input_image_name, output_directory, runmode=1):
     labeled_img_with_stats = np.zeros(output.shape)
     labeled_img_with_stats[output == max_label] = 255
 
-    write_image(labeled_img_with_stats, output_directory+"/labeled_otsu_with_stats.jpg", runmode=runmode)
+    write_image(labeled_img_with_stats, output_directory + "/labeled_otsu_with_stats.jpg", runmode=runmode)
 
 
 # Note: Connectivity 4 is better because, because this results in a better component,
@@ -173,7 +174,7 @@ def preprocess(input_image_name, output_directory, runmode=1):
     # labeled_img_with_stats = np.zeros(output.shape)
     # labeled_img_with_stats[output == max_label] = 255
 
-    # write_image(labeled_img_with_stats, output_directory+"/labeled_otsu_with_stats_2.jpg", runmode=runmode)
+    # write_image(labeled_img_with_stats, output_directory + "/labeled_otsu_with_stats_2.jpg", runmode=runmode)
 
 
 
@@ -189,7 +190,7 @@ def preprocess(input_image_name, output_directory, runmode=1):
     labeled_img_with_stats2 = np.zeros(output.shape)
     labeled_img_with_stats2[output == max_label] = 255
 
-    write_image(labeled_img_with_stats2, output_directory+"/labeled_sauvola_with_stats.jpg", runmode=runmode)
+    write_image(labeled_img_with_stats2, output_directory + "/labeled_sauvola_with_stats.jpg", runmode=runmode)
 
 
 
@@ -205,7 +206,7 @@ def preprocess(input_image_name, output_directory, runmode=1):
     # labeled_img_with_stats2 = np.zeros(output.shape)
     # labeled_img_with_stats2[output == max_label] = 255
 
-    # write_image(labeled_img_with_stats2, output_directory+"/labeled_sauvola_with_stats_2.jpg", runmode=runmode)
+    # write_image(labeled_img_with_stats2, output_directory + "/labeled_sauvola_with_stats_2.jpg", runmode=runmode)
 
 
 
@@ -220,7 +221,7 @@ def preprocess(input_image_name, output_directory, runmode=1):
         negative_image = img_as_ubyte(labeled_img_with_stats / 255)
 
     negative_image = 255 - negative_image
-    write_image(negative_image, output_directory+"/negativeImage2.jpg", runmode=runmode)
+    write_image(negative_image, output_directory + "/negativeImage2.jpg", runmode=runmode)
 
    
     nb_components, output, stats, centroids = cv2.connectedComponentsWithStats(negative_image, connectivity=8)
@@ -234,7 +235,7 @@ def preprocess(input_image_name, output_directory, runmode=1):
     labeled_img_with_stats3 = np.zeros(output.shape)
     labeled_img_with_stats3[output == max_label] = 255
 
-    write_image(labeled_img_with_stats3, output_directory+"/labeled_otsu_negative.jpg", runmode=runmode)
+    write_image(labeled_img_with_stats3, output_directory + "/labeled_otsu_negative.jpg", runmode=runmode)
 
 
 
@@ -250,7 +251,7 @@ def preprocess(input_image_name, output_directory, runmode=1):
        labeled_img_with_stats3 = img_as_ubyte(labeled_img_with_stats3 / 255)
 
     masked_otsu[labeled_img_with_stats3 == 255] = 255
-    write_image(masked_otsu, output_directory+"/maskedOtsu.jpg", runmode=runmode)
+    write_image(masked_otsu, output_directory + "/maskedOtsu.jpg", runmode=runmode)
 
 
 
@@ -258,7 +259,7 @@ def preprocess(input_image_name, output_directory, runmode=1):
     masked_sauvola = binarised_sauvola
     masked_sauvola[labeled_img_with_stats3 == 255] = 255
 
-    write_image(masked_sauvola, output_directory+"/maskedSauvola.jpg", runmode=runmode)
+    write_image(masked_sauvola, output_directory + "/maskedSauvola.jpg", runmode=runmode)
 
 
     # Mask image 3: different Sauvola binary
@@ -266,13 +267,13 @@ def preprocess(input_image_name, output_directory, runmode=1):
     k = 0.5 # This is optional parameter
     r = 128 # This is optional parameter
     binarised_sauvola_2 = binarise_sauvola(input_image, window_size=window_size, k=k, r=r)
-    write_image(binarised_sauvola_2, output_directory+"/binarisedSauvola2.jpg", runmode=runmode)
+    write_image(binarised_sauvola_2, output_directory + "/binarisedSauvola2.jpg", runmode=runmode)
     
 
     masked_sauvola = binarised_sauvola_2
     masked_sauvola[labeled_img_with_stats3 == 255] = 255
 
-    write_image(masked_sauvola, output_directory+"/maskedSauvola2.jpg", runmode=runmode)
+    write_image(masked_sauvola, output_directory + "/maskedSauvola2.jpg", runmode=runmode)
 
 
 # So far, we isolated the image, the optimal parameters (currently) are:
@@ -291,9 +292,25 @@ def preprocess(input_image_name, output_directory, runmode=1):
     lookahead = 20
     rot_image, rot_line_peaks, rot_degree = get_optimum_rotation(masked_sauvola, rotation_directory, lookahead = lookahead, runmode=runmode)
 
+    if runmode > 0:
+        filename = "optimumRotation=" + str(rot_degree) + ".jpg"
+        filepath = os.path.join(output_directory, filename)
+        write_image(rot_image, filepath, runmode=runmode)
+    
+    if runmode > 1:
+        print ("Optimum rotation = " + str(rot_degree))
+        write_line_peaks(rot_line_peaks, output_directory + '/line_peaks')
 
 # # Optionally, trim image from blank lines to have the main component only.
 # # (Use perhaps a blanks_allowed=10, i.e. have 10 white rows in each direction?)
 #     preprocessedImage = trimImage(rotatedImage, blanks_allowed=10)
 
-    return rot_image, rot_line_peaks, rot_degree
+    padding = 50
+    trimmed_rot_image = trim_image_with_component(rot_image, padding=padding)
+
+    if runmode > 0:
+        filename = "trimmed_" + filename
+        filepath = os.path.join(output_directory, filename)
+        write_image(trimmed_rot_image, filepath, runmode=runmode)
+
+    return trimmed_rot_image

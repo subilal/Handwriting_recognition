@@ -19,14 +19,9 @@ print ("")
 
 remove_directory(output_directory)
 ensure_directory(output_directory)
-rot_image, rot_line_peaks, rot_degree = preprocess(input_image_name, output_directory, runmode=runmode)
+preprocessed_image = preprocess(input_image_name, output_directory, runmode=runmode)
 
-print ("Optimum rotation=" + str(rot_degree))
-write_image(rot_image, output_directory + "/optimumRotation=" + str(rot_degree) + ".jpg", runmode=runmode)
-write_line_peaks(rot_line_peaks, output_directory+'/line_peaks')
-
-write_image(rot_image, output_directory_for_segmentation + "/image.jpg", runmode=runmode)
-write_line_peaks(rot_line_peaks, output_directory_for_segmentation + "/line_peaks")
+write_image(preprocessed_image, output_directory_for_segmentation + "/image.jpg", runmode=runmode)
 
 print ("")
 print ("Finished Preprocessing image " + image_name)

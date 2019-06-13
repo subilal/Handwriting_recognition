@@ -111,8 +111,19 @@ def segment_line_into_words(line_image, line_idx, word_peaks, output_directory, 
 ####### Main ########
 #####################
 
-def segment(image, line_peaks, output_directory, runmode=1):
+def segment(image, output_directory, runmode=1):
     lines_directory = output_directory + '/lines'
+
+    # 1 = column reduction.
+    # CV_REDUCE_AVG instead of sum, because we want the normalized number of pixels
+    histogram = cv2.reduce(image, 1, cv2.REDUCE_AVG)
+    # Transpose column vector into row vector
+    histogram = histogram.reshape(-1)
+
+    lookahead = 30
+    line_peaks = peakdetect(histogram, lookahead=lookahead)
+
+
     lines = segment_image_into_lines(image, line_peaks, lines_directory, runmode=runmode)
 
     line_idx = 0

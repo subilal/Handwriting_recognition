@@ -9,6 +9,7 @@ from Preprocess.preprocess import *
 from Segment.segment import *
 from Classifier.classifier import *
 
+
 #################
 ### Arguments ###
 #################
@@ -47,7 +48,6 @@ files = glob.glob(files_directory)
 output_directory = args.output
 ensure_directory(output_directory) # No need to remove the output folder first
 
-times_list = []
 
 ################
 ##### Main #####
@@ -61,14 +61,12 @@ print ("With extension:".ljust(padding) + extension)
 print ("Output Directory:".ljust(padding) + output_directory)
 print ("Runmode:".ljust(padding) + runmode_str)
 print ("")
+times_list = []
 initial_time = time.time()
 for image_name in files:
     start_time = time.time()
     _, image = os.path.split(image_name)
     
-    print ("")
-    print ("Processing " + image)
-
     image_name_base = os.path.splitext(image)[0]
     output_image_directory = os.path.abspath(os.path.join(output_directory, image_name_base))
 
@@ -76,28 +74,28 @@ for image_name in files:
     ensure_directory(output_image_directory)
 
     # Preprocess image
-    rot_image, rot_line_peaks, rot_degree = preprocess(image_name, output_image_directory, runmode=runmode)
-
-    write_image(rot_image, output_image_directory+"/OptimumRotation="+str(rot_degree)+".jpg", runmode=runmode)
-    
+    print ("")
+    print ("Processing " + image)
+    preprocessed_image = preprocess(image_name, output_image_directory, runmode=runmode)   
     print ("Finished preprocessing " + image)
+
     print ("    ****    ")
-    print ("Segmenting " + image)
     
     # Segment preprocessed image
-    segment(rot_image, rot_line_peaks, output_image_directory, runmode=runmode)
+    print ("Segmenting " + image)    
+    segment(preprocessed_image, output_image_directory, runmode=runmode)
+    print ("Finished segmenting " + image)
 
-    print ("Finished Segmenting " + image)
     print ("    ****    ")
-    print ("Classifying " + image)
+
 
     # Classify segmented image
-    output_path = classifier(image, output_image_directory, runmode=runmode)
-
-    print ("Finished Classifying " + image)
-    print ("")
-    print ("Output is in: " + output_path)
-    print ("")
+#    print ("Classifying " + image)
+#    output_path = classify(output_image_directory, runmode=runmode)
+#    print ("Finished classifying " + image)
+#    print ("")
+#    print ("Output is in: " + output_path)
+#    print ("")
 
     end_time = time.time()
     elapsed_time = end_time - start_time

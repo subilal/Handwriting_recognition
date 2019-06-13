@@ -10,6 +10,7 @@ def ensure_directory (directory):
     if not os.path.exists(directory):
         os.mkdir(directory)
 
+
 def remove_directory(directory):
     directory_path = os.path.abspath(directory)
     if os.path.exists(directory):

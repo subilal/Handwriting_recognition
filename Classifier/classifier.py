@@ -8,7 +8,7 @@ from sklearn.model_selection import train_test_split
 import os
 from skimage import io
 import pickle
-import transcription
+from Classifier.transcription import *
 
 with open('./Classifier/LabelEncoder.pickle', 'rb') as f:
 	LabelEncoder = pickle.load(f)
@@ -22,7 +22,7 @@ def classify(output_directory, runmode=1):
 
 	alpha_name = "alpha.txt"
 	alpha_txt = open(output_directory + "/" + alpha_name,'w')
-	lines_directory = output_directory + '/testing'
+	lines_directory = output_directory + '/lines'
 
 	line_labels = [ line for line in os.listdir(lines_directory) if os.path.isdir(os.path.join(lines_directory, line)) ]
 	line_labels.sort()
