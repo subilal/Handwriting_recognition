@@ -22,7 +22,7 @@ def classify(output_directory, runmode=1):
 
 	alpha_name = "alpha.txt"
 	alpha_txt = open(output_directory + "/" + alpha_name,'w')
-	lines_directory = output_directory + '/lines'
+	lines_directory = output_directory + '/testing'
 
 	line_labels = [ line for line in os.listdir(lines_directory) if os.path.isdir(os.path.join(lines_directory, line)) ]
 	line_labels.sort()
@@ -31,13 +31,14 @@ def classify(output_directory, runmode=1):
 		line_path = os.path.join(lines_directory, line_label)
 		word_labels = os.listdir(line_path)
 		word_labels.sort()
+		text = ""
 		for word_label in word_labels:
 			# print(word_label)
 			word_path = os.path.join(line_path, word_label)
 			word_image = cv.imread(word_path)
 			
 			# cv.imshow("", word_image)
-			print(word_image.shape)
+			# print(word_image.shape)
 			# cv.waitKey(0)
 			
 			height = word_image.shape[0]
@@ -45,9 +46,8 @@ def classify(output_directory, runmode=1):
 			letter_images = sliding_window(word_image, [height, width], stepsize)
 			
 			letters = predict(letter_images)
-			letters.reverse()
 			for l in letters:
-				text = text + '-' + l
+				text = text + "-" + str(l)
 
 			text = text + " "
 
@@ -75,22 +75,27 @@ def sliding_window(image, windowSize, stepSize=10):
 		# cv.imshow("", re_image)
 		# print(re_image.shape)
 		# cv.waitKey(0)
-		letter_images.append(re_image)
+		grayImage = cv.cvtColor(re_image, cv.COLOR_BGR2GRAY)
+		(thresh, BW) = cv.threshold(grayImage, 127, 255, cv.THRESH_BINARY)
+		letter_images.append(BW)
 		
 		if flag == 1:
 			break
-	print(len(letter_images))
+	# print(len(letter_images))
 	return np.array(letter_images)
 
 def predict(images):
 	letters = []
+	images = images.reshape(images.shape[0], 45, 35, 1)
 	predicted = model.predict(images, batch_size=images.shape[0])
-	print(predicted)
+	# print(predicted)
 	for prob_values in predicted:
-		if max(prob_values) > 80:
-			print(np.argmax(prob_values))
+		print(prob_values)
+		if max(prob_values) > .99:
 			letter = LabelEncoder.inverse_transform([np.argmax(prob_values)])
-			letters.append(letter)
+			letter = letter[0]
+			if letter != 'Space':
+				letters.append(letter)
 	return letters
 
 if __name__ == "__main__":

@@ -22,7 +22,7 @@ class CNN():
 		self.network.add(keras.layers.Conv2D(64, kernel_size=3, activation='relu'))
 		self.network.add(keras.layers.MaxPooling2D(pool_size=(2, 2), strides=None, padding='valid', data_format=None))
 		self.network.add(keras.layers.Flatten())
-		self.network.add(keras.layers.Dense(27, activation='softmax'))
+		self.network.add(keras.layers.Dense(28, activation='softmax'))
 
 	def extract_data(self, filepath):
 		data = []
