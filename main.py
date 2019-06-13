@@ -92,12 +92,11 @@ for image_name in files:
     print ("Classifying " + image)
 
     # Classify segmented image
-    text = classifier (image, output_image_directory, runmode=runmode)
+    output_path = classifier(image, output_image_directory, runmode=runmode)
 
     print ("Finished Classifying " + image)
     print ("")
-    print ("Output:")
-    print (text)
+    print ("Output is in: " + output_path)
     print ("")
 
     end_time = time.time()

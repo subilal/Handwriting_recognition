@@ -17,7 +17,7 @@ class CNN():
 
 	def __init__(self):
 		self.network = keras.Sequential()
-		self.network.add(keras.layers.Conv2D(32, kernel_size=3, activation='relu', input_shape=(45,35,3)))
+		self.network.add(keras.layers.Conv2D(32, kernel_size=3, activation='relu', input_shape=(45,35,1)))
 		self.network.add(keras.layers.MaxPooling2D(pool_size=(2, 2), strides=None, padding='valid', data_format=None))
 		self.network.add(keras.layers.Conv2D(64, kernel_size=3, activation='relu'))
 		self.network.add(keras.layers.MaxPooling2D(pool_size=(2, 2), strides=None, padding='valid', data_format=None))
@@ -36,18 +36,20 @@ class CNN():
 				image_path = os.path.join(label_path, img)
 				image = cv.imread(image_path)
 				re_image = cv.resize(image, (35,45))
-				data.append(re_image)
+				grayImage = cv.cvtColor(re_image, cv.COLOR_BGR2GRAY)
+				(thresh, BW) = cv.threshold(grayImage, 127, 255, cv.THRESH_BINARY)
+				data.append(BW)
 				data_labels.append(label)
 		
 		data = np.array(data, dtype="float") / 255.0
-		data = data.reshape(data.shape[0], 45, 35, 3)
+		data = data.reshape(data.shape[0], 45, 35, 1)
 		data_labels = np.array(data_labels)
 		return [data, data_labels]
 
 
 if __name__ == "__main__":
 
-	data_path = './character_data'
+	data_path = '../Train-input'
 	model = CNN()	
 
 	[data, labels] = model.extract_data(data_path)
@@ -62,7 +64,14 @@ if __name__ == "__main__":
 	# plt.show()
 	
 	label_encoder = LabelEncoder()
-	integer_encoded = label_encoder.fit_transform(labels)	
+	onehot_encoder = OneHotEncoder(sparse=False)
+	
+	le = label_encoder.fit(labels)
+	integer_encoded = le.transform(labels)
+	integer_encoded = integer_encoded.reshape(len(integer_encoded), 1)
+
+	ohe = onehot_encoder.fit(integer_encoded)
+
 	(train_images, test_images, train_labels, test_labels) = train_test_split(data,	integer_encoded, test_size=0.25, random_state=42)
 
 	datagen = keras.preprocessing.image.ImageDataGenerator(
@@ -77,13 +86,21 @@ if __name__ == "__main__":
 	datagen.fit(train_images)
 
 	# cv.imshow("", train_images[10])
+	# print(train_images[10].shape)
 	# cv.waitKey(0)
 
-	train_labels = keras.utils.to_categorical(train_labels)
-	test_labels = keras.utils.to_categorical(test_labels)
+	# train_labels = keras.utils.to_categorical(train_labels)
+	# test_labels = keras.utils.to_categorical(test_labels)
+	train_labels = ohe.transform(train_labels)
+	test_labels = ohe.transform(test_labels)
 	opt = keras.optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False)
 	model.network.compile(optimizer=opt, loss='categorical_crossentropy', metrics=['accuracy'])
 	hist = model.network.fit_generator(datagen.flow(train_images, train_labels, batch_size=100), validation_data=(test_images, test_labels), epochs=100)
 	model.network.save('trained_cnn.h5')
-	with open('trainHistoryDict', 'wb') as file:
-		pickle.dump(hist.history, file)
+
+	with open('trainHistoryDict.pickle', 'wb') as file:
+		pickle.dump(hist.history, file, pickle.HIGHEST_PROTOCOL)
+	with open('LabelEncoder.pickle', 'wb') as file:
+		pickle.dump(le, file, pickle.HIGHEST_PROTOCOL)
+	with open('OneHotEncoder.pickle', 'wb') as file:
+		pickle.dump(ohe, file, pickle.HIGHEST_PROTOCOL)
