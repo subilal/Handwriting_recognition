@@ -83,7 +83,7 @@ for image_name in files:
     
     # Segment preprocessed image
     print ("Segmenting " + image)    
-    segment(preprocessed_image, output_image_directory, runmode=runmode)
+    words_li_li = segment(preprocessed_image, output_image_directory, runmode=runmode)
     print ("Finished segmenting " + image)
 
     print ("    ****    ")

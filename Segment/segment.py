@@ -57,6 +57,9 @@ def segment_image_into_lines(image, line_peaks, output_directory, runmode=1):
 
     remove_directory(output_directory)
     ensure_directory(output_directory)
+
+    padding = 100
+    trim_image_with_component(line, padding=padding)
     write_image(line, output_directory + '/line_0.jpg', runmode=runmode)
 
     for idx in range (1, len(rows)):
@@ -65,6 +68,7 @@ def segment_image_into_lines(image, line_peaks, output_directory, runmode=1):
         line = image[start:end]
         lines.append(line)
 
+        trim_image_with_component(line, padding=padding)
         write_image(line, output_directory + '/line_' + str(idx) + '.jpg', runmode=runmode)
 
     return lines
@@ -95,6 +99,9 @@ def segment_line_into_words(line_image, line_idx, word_peaks, output_directory, 
 
     remove_directory(output_directory)
     ensure_directory(output_directory)
+
+    padding = 100
+    trim_image_with_component(word, padding=padding)
     write_image(word, output_directory + '/word_0.jpg', runmode=runmode)
 
     for idx in range (1, len(cols)):
@@ -103,6 +110,7 @@ def segment_line_into_words(line_image, line_idx, word_peaks, output_directory, 
         word = line_image[0:height, start:end]
         words.append(word)
 
+        trim_image_with_component(word, padding=padding)
         write_image(word, output_directory + '/word_' + str(idx) + '.jpg', runmode=runmode)
 
     return words
@@ -113,6 +121,7 @@ def segment_line_into_words(line_image, line_idx, word_peaks, output_directory, 
 
 def segment(image, output_directory, runmode=1):
     lines_directory = output_directory + '/lines'
+    words_li_li = []
 
     # 1 = column reduction.
     # CV_REDUCE_AVG instead of sum, because we want the normalized number of pixels
@@ -123,13 +132,13 @@ def segment(image, output_directory, runmode=1):
     lookahead = 30
     line_peaks = peakdetect(histogram, lookahead=lookahead)
 
-
     lines = segment_image_into_lines(image, line_peaks, lines_directory, runmode=runmode)
 
+    padding = 100
     line_idx = 0
     for line in lines:
         line_histogram = cv2.reduce(line, 0, cv2.REDUCE_AVG)
-#        trim_image (line, 0)
+
         # Transpose column vector into row vector
         line_histogram = line_histogram.reshape(-1)
         lookahead = 30
@@ -151,3 +160,6 @@ def segment(image, output_directory, runmode=1):
             print ("Words for line " + str(line_idx) + " created!")
 
         line_idx = line_idx + 1
+        words_li_li.append(words)
+
+    return words_li_li
