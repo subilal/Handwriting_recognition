@@ -110,9 +110,6 @@ def predict(images):
 				letters.append(letter)
 	return letters
 
-if __name__ == "__main__":
-	classify = classify("./TestOutputSegment")
-
 
 
 
