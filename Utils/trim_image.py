@@ -4,7 +4,7 @@ import cv2
 This function will trim the blank rows/columns of an image
 '''
 
-def trim_image_with_component(image, padding=10):
+def trim_image(image, padding=10):
     nr_rows = image.shape[0]
     nr_cols = image.shape[1]
 

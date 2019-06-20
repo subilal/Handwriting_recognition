@@ -304,12 +304,9 @@ def preprocess(input_image_name, output_directory, runmode=1):
         print ("Optimum rotation = " + str(rot_degree))
         write_line_peaks(rot_line_peaks, output_directory + '/line_peaks')
 
-# # Optionally, trim image from blank lines to have the main component only.
-# # (Use perhaps a blanks_allowed=10, i.e. have 10 white rows in each direction?)
-#     preprocessedImage = trimImage(rotatedImage, blanks_allowed=10)
-
+# Trim image from blank lines to have the main component only.
     padding = 50
-    trimmed_rot_image = trim_image_with_component(rot_image, padding=padding)
+    trimmed_rot_image = trim_image(rot_image, padding=padding)
 
     if runmode > 0:
         filename = "trimmed_" + filename

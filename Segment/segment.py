@@ -58,7 +58,7 @@ def segment_image_into_lines(image, line_peaks, output_directory, padding=10, ru
     remove_directory(output_directory)
     ensure_directory(output_directory)
 
-    trimmed_line = trim_image_with_component(line, padding=padding)
+    trimmed_line = trim_image(line, padding=padding)
     write_image(line, output_directory + '/line_0.jpg', runmode=runmode)
 
     for idx in range (1, len(rows)):
@@ -67,7 +67,7 @@ def segment_image_into_lines(image, line_peaks, output_directory, padding=10, ru
         line = image[start:end]
         lines.append(line)
 
-        trimmed_line = trim_image_with_component(line, padding=padding)
+        trimmed_line = trim_image(line, padding=padding)
         write_image(trimmed_line, output_directory + '/line_' + str(idx) + '.jpg', runmode=runmode)
 
     return lines
@@ -99,7 +99,7 @@ def segment_line_into_words(line_image, line_idx, word_peaks, output_directory, 
     remove_directory(output_directory)
     ensure_directory(output_directory)
 
-    trimmed_word = trim_image_with_component(word, padding=padding)
+    trimmed_word = trim_image(word, padding=padding)
     write_image(trimmed_word, output_directory + '/word_0.jpg', runmode=runmode)
 
     for idx in range (1, len(cols)):
@@ -108,7 +108,7 @@ def segment_line_into_words(line_image, line_idx, word_peaks, output_directory, 
         word = line_image[0:height, start:end]
         words.append(word)
 
-        trimmed_word = trim_image_with_component(word, padding=padding)
+        trimmed_word = trim_image(word, padding=padding)
         write_image(trimmed_word, output_directory + '/word_' + str(idx) + '.jpg', runmode=runmode)
 
     return words
