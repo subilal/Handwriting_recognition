@@ -89,7 +89,7 @@ def predict(images):
 	predicted = model.predict(images, batch_size=images.shape[0])
 	# print(predicted)
 	for prob_values in predicted:
-		print(prob_values)
+		# print(prob_values)
 		if max(prob_values) > .99:
 			letter = LabelEncoder.inverse_transform([np.argmax(prob_values)])
 			letter = letter[0]
