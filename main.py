@@ -48,63 +48,70 @@ files = glob.glob(files_directory)
 output_directory = args.output
 ensure_directory(output_directory) # No need to remove the output folder first
 
+# Handle empty directory
+if (not files):
+    print("ERROR: Directory " + input_directory + " is empty!")
+    sys.exit()
 
 ################
 ##### Main #####
 ################
 
 # Run the program
-padding = 35
+line_padding = 35
 print ("")
-print ("Processing files from directory:".ljust(padding) + input_directory)
-print ("With extension:".ljust(padding) + extension)
-print ("Output Directory:".ljust(padding) + output_directory)
-print ("Runmode:".ljust(padding) + runmode_str)
+print ("Processing files from directory:".ljust(line_padding) + input_directory)
+print ("With extension:".ljust(line_padding) + extension)
+print ("Output Directory:".ljust(line_padding) + output_directory)
+print ("Runmode:".ljust(line_padding) + runmode_str)
 print ("")
 times_list = []
 initial_time = time.time()
+end_time = initial_time
 for image_name in files:
-	start_time = time.time()
-	_, image = os.path.split(image_name)
-	
-	image_name_base = os.path.splitext(image)[0]
-	output_image_directory = os.path.abspath(os.path.join(output_directory, image_name_base))
+    start_time = time.time()
+    _, image = os.path.split(image_name)
+    
+    image_name_base = os.path.splitext(image)[0]
+    output_image_directory = os.path.abspath(os.path.join(output_directory, image_name_base))
 
-	remove_directory(output_image_directory)
-	ensure_directory(output_image_directory)
+    remove_directory(output_image_directory)
+    ensure_directory(output_image_directory)
 
-	# Preprocess image
-	print ("")
-	print ("Processing " + image)
-	preprocessed_image = preprocess(image_name, output_image_directory, runmode=runmode)   
-	print ("Finished preprocessing " + image)
+    # Preprocess image
+    print ("")
+    print ("Processing " + image)
+    preprocessed_image = preprocess(image_name, output_image_directory, runmode=runmode)   
+    print ("Finished preprocessing " + image)
 
-	print ("    ****    ")
-	
-	# Segment preprocessed image
-	print ("Segmenting " + image)    
-	words_li_li = segment(preprocessed_image, output_image_directory, runmode=runmode)
-	print ("Finished segmenting " + image)
+    print ("    ****    ")
+    
+    # Segment preprocessed image
+    print ("Segmenting " + image)    
+    words_li_li = segment(preprocessed_image, output_image_directory, runmode=runmode)
+    print ("Finished segmenting " + image)
 
-	print ("    ****    ")
+    print ("    ****    ")
 
-	# Classify segmented image
-	print ("Classifying " + image)
-	output_path = classify(output_image_directory, runmode=runmode)
-	print ("Finished classifying " + image)
-	print ("")
-	print ("Output is in: " + output_path)
-	print ("")
+    # Classify segmented image
+    print ("Classifying " + image)
+    output_path = classify(output_image_directory, runmode=runmode)
+    print ("Finished classifying " + image)
+    print ("")
+    print ("Output is in: " + output_path)
+    print ("")
 
-	end_time = time.time()
-	elapsed_time = end_time - start_time
-	print ("Elapsed time: " + str(elapsed_time))
-	print ("-" * padding)
+    # Duration of the whole pipeline for each image
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print ("Elapsed time: " + str(elapsed_time))
+    print ("-" * line_padding)
 
-	times_list.append(elapsed_time)
+    times_list.append(elapsed_time)
 
+# Show statistics including total and average duration
 total_elapsed_time = end_time - initial_time
 average_time = np.average(times_list)
 print ("Total elapsed time: " + str(total_elapsed_time))
 print ("Average/image = " + str(average_time))
-print ("-" * padding)
+print ("-" * line_padding)

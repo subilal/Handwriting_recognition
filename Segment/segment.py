@@ -35,7 +35,7 @@ Both methods make use of the peakdetect method.
 - image is optimally rotated.
 '''
 
-def segment_image_into_lines(image, line_peaks, output_directory, runmode=1):
+def segment_image_into_lines(image, line_peaks, output_directory, padding=10, runmode=1):
     rows = []
     lines = []
     height = image.shape[0]
@@ -58,7 +58,6 @@ def segment_image_into_lines(image, line_peaks, output_directory, runmode=1):
     remove_directory(output_directory)
     ensure_directory(output_directory)
 
-    padding = 100
     trim_image_with_component(line, padding=padding)
     write_image(line, output_directory + '/line_0.jpg', runmode=runmode)
 
@@ -74,7 +73,7 @@ def segment_image_into_lines(image, line_peaks, output_directory, runmode=1):
     return lines
 
 
-def segment_line_into_words(line_image, line_idx, word_peaks, output_directory, runmode=1):
+def segment_line_into_words(line_image, line_idx, word_peaks, output_directory, padding=10, runmode=1):
     cols = []
     words = []
 
@@ -100,7 +99,6 @@ def segment_line_into_words(line_image, line_idx, word_peaks, output_directory, 
     remove_directory(output_directory)
     ensure_directory(output_directory)
 
-    padding = 100
     trim_image_with_component(word, padding=padding)
     write_image(word, output_directory + '/word_0.jpg', runmode=runmode)
 
@@ -119,7 +117,7 @@ def segment_line_into_words(line_image, line_idx, word_peaks, output_directory, 
 ####### Main ########
 #####################
 
-def segment(image, output_directory, runmode=1):
+def segment(image, output_directory, padding=10, runmode=1):
     lines_directory = output_directory + '/lines'
     words_li_li = []
 
@@ -132,7 +130,7 @@ def segment(image, output_directory, runmode=1):
     lookahead = 30
     line_peaks = peakdetect(histogram, lookahead=lookahead)
 
-    lines = segment_image_into_lines(image, line_peaks, lines_directory, runmode=runmode)
+    lines = segment_image_into_lines(image, line_peaks, lines_directory, padding=padding, runmode=runmode)
 
     padding = 100
     line_idx = 0
@@ -154,7 +152,7 @@ def segment(image, output_directory, runmode=1):
         remove_directory(words_directory)
         ensure_directory(words_directory)
 
-        words = segment_line_into_words(line, line_idx, word_peaks, words_directory, runmode=runmode)
+        words = segment_line_into_words(line, line_idx, word_peaks, words_directory, padding=padding, runmode=runmode)
         
         if runmode > 1:
             print ("Words for line " + str(line_idx) + " created!")

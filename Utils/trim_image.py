@@ -12,7 +12,7 @@ def trim_image_with_component(image, padding=10):
     cols_reduced = cv2.reduce(image, 0, cv2.REDUCE_MIN).reshape(-1)
 
     # First, determine the number of blanc lines from the top
-    threshold = 255
+    threshold = 250
     blancs_top = count_blancs_until_component(rows_reduced, min_threshold=threshold)
     new_top = max (blancs_top - padding, 0)
 
