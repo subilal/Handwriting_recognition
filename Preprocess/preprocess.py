@@ -290,7 +290,10 @@ def preprocess(input_image_name, output_directory, runmode=1):
     remove_directory(rotation_directory)
     ensure_directory(rotation_directory)
     lookahead = 20
-    rot_image, rot_line_peaks, rot_degree = get_optimum_rotation(masked_sauvola, rotation_directory, lookahead = lookahead, runmode=runmode)
+    min_degree = -6
+    max_degree = 6
+    rot_image, rot_line_peaks, rot_degree = get_optimum_rotation(masked_sauvola, rotation_directory, lookahead = lookahead,
+                                                                min_degree=min_degree, max_degree=max_degree, runmode=runmode)
 
     if runmode > 0:
         filename = "optimumRotation=" + str(rot_degree) + ".jpg"
