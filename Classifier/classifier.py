@@ -15,9 +15,8 @@ with open('./Classifier/LabelEncoder.pickle', 'rb') as f:
 with open('./Classifier/OneHotEncoder.pickle', 'rb') as f:
 	OneHotEncoder = pickle.load(f)
 model = keras.models.load_model('./Classifier/trained_cnn.h5')
-stepsize = 20
 
-def classify(output_directory, runmode=1):
+def classify(output_directory, stepsize=20, runmode=1):
 
 	alpha_name = "alpha.txt"
 	alpha_txt = open(output_directory + "/" + alpha_name,'w')
@@ -44,11 +43,12 @@ def classify(output_directory, runmode=1):
 			width = 40 if word_image.shape[1] > 40 else word_image.shape[1]
 			letter_images = sliding_window(word_image, [height, width], stepsize)
 			
-			letters = predict(letter_images)
-			for l in letters:
-				text = text + "-" + str(l)
+			if len(letter_images) > 0:
+				letters = predict(letter_images)
+				for l in letters:
+					text = text + "-" + str(l)
 
-			text = text + " "
+				text = text + " "
 
 		alpha_txt.write(text)
 		alpha_txt.write("\n")
@@ -61,6 +61,7 @@ def classify(output_directory, runmode=1):
 def sliding_window(image, windowSize, stepSize=10):
 	letter_images = []
 	flag = 0
+	threshold = 250
 	# slide a window across the image
 	for x in range(0, image.shape[1], stepSize):
 		# yield the current window
@@ -69,6 +70,16 @@ def sliding_window(image, windowSize, stepSize=10):
 		else:
 			window_img = image[0:windowSize[0], x:image.shape[1]]
 			flag = 1
+
+		rows_reduced = cv.reduce(image, 1, cv.REDUCE_AVG).reshape(-1)
+		if len(rows_reduced) < 1:
+			continue
+		avg_value = np.average(rows_reduced)
+		
+		# print("Iter="+str(x) + " - avg=" + str(avg_value)) 
+
+		if avg_value > threshold:
+			continue
 
 		re_image = cv.resize(window_img, (35,45))
 		# cv.imshow("", re_image)
