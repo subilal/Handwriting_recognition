@@ -39,21 +39,29 @@ mainSegment.py - executable only for the segmentation
 
 ## Commands
 
-(This application is programmed in Python 3. For brevity, `python3` commands will be used as `python`).
+(This application is programmed in Python 3. For brevity, `python3` commands will be used as `python` and `pip3` command will be used as `pip`). We have two methods for creating virtual environment (`virtualenv` or `pipenv`), choose anyone.
 
 Installation:
 
 - install Python 3 (ideally 3.6.x, but not 3.7.x because it does not support TensorFlow yet)
 
-Optionally:
+# 1 -Using virtualenv:
+
+- install `virtualenv` using `pip install virtualenv`
+- navigate to the main folder
+- create virtual environment using `virtualenv -p python3 env`
+- activate the environment using `source env/bin/activate`
+- install all the required libraries using `pip install -r requirements.txt`
+
+
+# 2 - Using pipenv:
 
 - install `pipenv` using `pip install pipenv`
-
 - install the program using `pipenv install` when you are in the main folder.
 
 Notes about `pipenv`:
-
 - If `pipenv` is used (or perhaps `virtualenv`), then `pipenv run` must be appended to the following commands.
+
 
 ### Running the full pipeline:
 
@@ -77,7 +85,11 @@ For Classifier:
 
 1. Command line help:
 
-   `pipenv run python main.py -h`
+   when using `pipenv`:
+   `pipenv run python main.py -h` 
+   
+   when using `virtualenv`:
+   `python main.py -h`
 
    Output:
 
@@ -101,10 +113,14 @@ For Classifier:
   
 2. Sample running 4 images of about 2156 x 1625 in FAST mode:
 
-   Using the command: `pipenv run python main.py -f InputDummy -o OutputDummy`
+   Using the command: </br>
+   `pipenv run python main.py -f InputTest -o OutputTest` -- incase of `pipenv` OR, </br>
+   `python main.py -f InputTest -o OutputTest` -- incase of `virtualenv`
+  
+  Output:
 
   ```
-  pipenv run python main.py -f InputDummy -o OutputDummy
+  pipenv run python main.py -f InputTest -o OutputTest
 
   Processing files from directory:   InputTest
   With extension:                    *jpg
