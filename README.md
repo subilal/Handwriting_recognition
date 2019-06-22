@@ -67,6 +67,8 @@ Notes about `pipenv`:
 
 - `python main.py input_folder`
 
+### For testing individually:
+
 For preprocessing:
 
 - `python mainPreprocess.py` -> the input file must be manually typed in.
@@ -79,7 +81,8 @@ For Classifier:
 
 - `python Classifier\train_network.py` -> for training the network
 
-- `python mainClassifier.py` -> for classification
+- `python mainClassifier.py` -> for classification. Input file must be manually typed in.
+
 
 ## Samples
 
