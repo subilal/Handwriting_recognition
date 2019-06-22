@@ -55,9 +55,6 @@ def segment_image_into_lines(image, line_peaks, output_directory, padding=10, ru
     line = image[start:end]
     lines.append(line)
 
-    remove_directory(output_directory)
-    ensure_directory(output_directory)
-
     trimmed_line = trim_image(line, padding=padding)
     write_image(line, output_directory + '/line_0.jpg', runmode=runmode)
 
@@ -86,7 +83,8 @@ def segment_line_into_words(line_image, line_idx, word_peaks, output_directory, 
         return words
     elif word_peaks[0]:
         for peak in word_peaks[0]:
-            cols.append(peak[0])
+            if peak[1] >= 255:
+                cols.append(peak[0])
         
     cols.append(width)
 
@@ -95,9 +93,6 @@ def segment_line_into_words(line_image, line_idx, word_peaks, output_directory, 
     height = line_image.shape[0]
     word = line_image[0:height, start:end]
     words.append(word)
-
-    remove_directory(output_directory)
-    ensure_directory(output_directory)
 
     trimmed_word = trim_image(word, padding=padding)
     write_image(trimmed_word, output_directory + '/word_0.jpg', runmode=runmode)
@@ -130,6 +125,9 @@ def segment(image, output_directory, padding=10, runmode=1):
     lookahead = 30
     line_peaks = peakdetect(histogram, lookahead=lookahead)
 
+    remove_directory(lines_directory)
+    ensure_directory(lines_directory)
+
     lines = segment_image_into_lines(image, line_peaks, lines_directory, padding=padding, runmode=runmode)
 
     line_idx = 0
@@ -144,7 +142,7 @@ def segment(image, output_directory, padding=10, runmode=1):
         if runmode > 1:
             plt.plot(line_histogram)
             plt.title('Line=' + str(line_idx))
-            plt.savefig(lines_directory+'/histogram_' + str(line_idx) + '.jpg')
+            plt.savefig(lines_directory + '/histogram_' + str(line_idx) + '.jpg')
             plt.clf()
 
         words_directory = lines_directory + '/line_' + str(line_idx)
@@ -152,9 +150,6 @@ def segment(image, output_directory, padding=10, runmode=1):
         ensure_directory(words_directory)
 
         words = segment_line_into_words(line, line_idx, word_peaks, words_directory, padding=padding, runmode=runmode)
-        
-        if runmode > 1:
-            print ("Words for line " + str(line_idx) + " created!")
 
         line_idx = line_idx + 1
         words_li_li.append(words)
