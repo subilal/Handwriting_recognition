@@ -1,8 +1,9 @@
 # coding: utf-8
 import os
 
-def transcript(path, file_name):
-    f = open(path + "/" + file_name,'r')
+def transcript(directory, alpha_file, output_file="output.txt"):
+    input_path = os.path.join(directory, alpha_file)
+    f = open(input_path, 'r')
     # text = f.read()
     lines = f.readlines()
     temp_lines = []
@@ -40,15 +41,12 @@ def transcript(path, file_name):
 
     max_len = max([len(line) for line in temp_lines])
 
-    output_name = "output.txt" 
-    fo = open(path + "/" + output_name, 'w', encoding='utf-8')
+    output_path = os.path.join(directory, output_file)
+    fo = open(output_path, 'w', encoding='utf-8')
     for line in temp_lines:
-        padding = ""
-        for i in range(0,(max_len - (len(line) - 1))):
-            padding = padding + " "
-        fo.write(padding + line)
+        # each line is padded with the maximum length
+        fo.write(line.rjust(max_len))
     fo.close()
 
-    # os.remove(path + "/" + file_name)
-    return path+"/"+output_name
+    return output_path
 

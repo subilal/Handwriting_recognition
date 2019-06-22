@@ -57,8 +57,6 @@ def classify(output_directory, stepsize=30, runmode=1):
 	alpha_txt.close()
 	return transcription.transcript(output_directory, alpha_name)
 
-	# Idea: return the string.
-	# For runmode > 1 (i.e. debug mode), we also want to save the .txt file
 
 def sliding_window(image, windowSize, stepSize=10):
 	letter_images = []

@@ -121,8 +121,9 @@ def preprocess(input_image_name, output_directory, runmode=1):
     binarised_otsu = binarise_otsu(input_image)
 
     # Save binarised images.
-    write_image(binarised_sauvola, output_directory + "/binarisedSauvola.jpg", runmode=runmode)
-    write_image(binarised_otsu, output_directory + "/binarisedOtsu.jpg", runmode=runmode)
+    if runmode > 1: # show this only in debug mode
+        write_image(binarised_sauvola, output_directory + "/binarisedSauvola.jpg", runmode=runmode)
+        write_image(binarised_otsu, output_directory + "/binarisedOtsu.jpg", runmode=runmode)
 
 
     # Get the connected componenets. Get a feeling of how the connection is done.
@@ -140,7 +141,8 @@ def preprocess(input_image_name, output_directory, runmode=1):
     # set bg label to black.
     labeled_img[label_hue == 0] = 0
     
-    write_image(labeled_img, output_directory + "/labeled_otsu.jpg", runmode=runmode)
+    if runmode > 1: # show this only in debug mode
+        write_image(labeled_img, output_directory + "/labeled_otsu.jpg", runmode=runmode)
 
 
     # First attempt, Otsu with connectivity 4:
@@ -155,7 +157,8 @@ def preprocess(input_image_name, output_directory, runmode=1):
     labeled_img_with_stats = np.zeros(output.shape)
     labeled_img_with_stats[output == max_label] = 255
 
-    write_image(labeled_img_with_stats, output_directory + "/labeled_otsu_with_stats.jpg", runmode=runmode)
+    if runmode > 1: # show this only in debug mode
+        write_image(labeled_img_with_stats, output_directory + "/labeled_otsu_with_stats.jpg", runmode=runmode)
 
 
 # Note: Connectivity 4 is better because, because this results in a better component,
@@ -174,7 +177,8 @@ def preprocess(input_image_name, output_directory, runmode=1):
     # labeled_img_with_stats = np.zeros(output.shape)
     # labeled_img_with_stats[output == max_label] = 255
 
-    # write_image(labeled_img_with_stats, output_directory + "/labeled_otsu_with_stats_2.jpg", runmode=runmode)
+    # if runmode > 1: # show this only in debug mode
+    #     write_image(labeled_img_with_stats, output_directory + "/labeled_otsu_with_stats_2.jpg", runmode=runmode)
 
 
 
@@ -190,7 +194,8 @@ def preprocess(input_image_name, output_directory, runmode=1):
     labeled_img_with_stats2 = np.zeros(output.shape)
     labeled_img_with_stats2[output == max_label] = 255
 
-    write_image(labeled_img_with_stats2, output_directory + "/labeled_sauvola_with_stats.jpg", runmode=runmode)
+    if runmode > 1: # show this only in debug mode
+        write_image(labeled_img_with_stats2, output_directory + "/labeled_sauvola_with_stats.jpg", runmode=runmode)
 
 
 
@@ -206,7 +211,8 @@ def preprocess(input_image_name, output_directory, runmode=1):
     # labeled_img_with_stats2 = np.zeros(output.shape)
     # labeled_img_with_stats2[output == max_label] = 255
 
-    # write_image(labeled_img_with_stats2, output_directory + "/labeled_sauvola_with_stats_2.jpg", runmode=runmode)
+    # if runmode > 1: # show this only in debug mode
+    #     write_image(labeled_img_with_stats2, output_directory + "/labeled_sauvola_with_stats_2.jpg", runmode=runmode)
 
 
 
@@ -221,7 +227,8 @@ def preprocess(input_image_name, output_directory, runmode=1):
         negative_image = img_as_ubyte(labeled_img_with_stats / 255)
 
     negative_image = 255 - negative_image
-    write_image(negative_image, output_directory + "/negativeImage2.jpg", runmode=runmode)
+    if runmode > 1: # show this only in debug mode
+        write_image(negative_image, output_directory + "/negativeImage2.jpg", runmode=runmode)
 
    
     nb_components, output, stats, centroids = cv2.connectedComponentsWithStats(negative_image, connectivity=8)
@@ -235,7 +242,8 @@ def preprocess(input_image_name, output_directory, runmode=1):
     labeled_img_with_stats3 = np.zeros(output.shape)
     labeled_img_with_stats3[output == max_label] = 255
 
-    write_image(labeled_img_with_stats3, output_directory + "/labeled_otsu_negative.jpg", runmode=runmode)
+    if runmode > 1: # show this only in debug mode
+        write_image(labeled_img_with_stats3, output_directory + "/labeled_otsu_negative.jpg", runmode=runmode)
 
 
 
@@ -251,7 +259,8 @@ def preprocess(input_image_name, output_directory, runmode=1):
        labeled_img_with_stats3 = img_as_ubyte(labeled_img_with_stats3 / 255)
 
     masked_otsu[labeled_img_with_stats3 == 255] = 255
-    write_image(masked_otsu, output_directory + "/maskedOtsu.jpg", runmode=runmode)
+    if runmode > 1: # show this only in debug mode
+        write_image(masked_otsu, output_directory + "/maskedOtsu.jpg", runmode=runmode)
 
 
 
@@ -259,7 +268,8 @@ def preprocess(input_image_name, output_directory, runmode=1):
     masked_sauvola = binarised_sauvola
     masked_sauvola[labeled_img_with_stats3 == 255] = 255
 
-    write_image(masked_sauvola, output_directory + "/maskedSauvola.jpg", runmode=runmode)
+    if runmode > 1: # show this only in debug mode
+        write_image(masked_sauvola, output_directory + "/maskedSauvola.jpg", runmode=runmode)
 
 
     # Mask image 3: different Sauvola binary
@@ -267,13 +277,14 @@ def preprocess(input_image_name, output_directory, runmode=1):
     k = 0.5 # This is optional parameter
     r = 128 # This is optional parameter
     binarised_sauvola_2 = binarise_sauvola(input_image, window_size=window_size, k=k, r=r)
-    write_image(binarised_sauvola_2, output_directory + "/binarisedSauvola2.jpg", runmode=runmode)
+    if runmode > 1: # show this only in debug mode
+        write_image(binarised_sauvola_2, output_directory + "/binarisedSauvola2.jpg", runmode=runmode)
     
 
     masked_sauvola = binarised_sauvola_2
     masked_sauvola[labeled_img_with_stats3 == 255] = 255
-
-    write_image(masked_sauvola, output_directory + "/maskedSauvola2.jpg", runmode=runmode)
+    if runmode > 1: # show this only in debug mode
+        write_image(masked_sauvola, output_directory + "/maskedSauvola2.jpg", runmode=runmode)
 
 
 # So far, we isolated the image, the optimal parameters (currently) are:
