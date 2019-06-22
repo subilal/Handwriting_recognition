@@ -45,28 +45,33 @@ Installation:
 
 - install Python 3 (ideally 3.6.x, but not 3.7.x because it does not support TensorFlow yet)
 
+Optionally:
+
 - install `pipenv` using `pip install pipenv`
 
 - install the program using `pipenv install` when you are in the main folder.
 
+Notes about `pipenv`:
+
+- If `pipenv` is used (or perhaps `virtualenv`), then `pipenv run` must be appended to the following commands.
+
+### Running the full pipeline:
+
+- `python main.py input_folder`
+
 For preprocessing:
 
-- `pipenv run python Preprocess\preprocess.py name-of-input-file name-of-output-directory`
-
-- or `pipenv run python mainPreprocess.py` -> the input file must be manually typed in.
+- `python mainPreprocess.py` -> the input file must be manually typed in.
 
 For segmentation:
 
-- `pipenv run python Segment\segment.py name-of-input-file name-of-output-directory`
-
-- or `pipenv run python mainSegment.py` -> the input file must be manually typed in.
+- `python mainSegment.py` -> the input file must be manually typed in.
 
 For Classifier:
 
-- `pipenv run Classifier\train_network.py`
+- `python Classifier\train_network.py` -> for training the network
 
-All together:
-- `python main.py input_folder`
+- `python mainClassifier.py` -> for classification
 
 ## Samples
 
@@ -94,46 +99,75 @@ All together:
                           specify the output directory
   ```
   
-2. Sample running 3 images of about 2156 x 1625 in FAST mode:
+2. Sample running 4 images of about 2156 x 1625 in FAST mode:
 
    Using the command: `pipenv run python main.py -f InputDummy -o OutputDummy`
 
   ```
   pipenv run python main.py -f InputDummy -o OutputDummy
 
-  Processing files from directory:   InputDummy
+  Processing files from directory:   InputTest
   With extension:                    *jpg
-  Output Directory:                  OutputDummy
-  Runmode:                           FAST
+  Output Directory:                  OutputTest
+  Runmode:                           NORMAL
 
 
   Processing image1.jpg
   Finished preprocessing image1.jpg
       ****
   Segmenting image1.jpg
-  Finished Segmenting image1.jpg
+  Finished segmenting image1.jpg
+      ****
+  Classifying image1.jpg
+  Finished classifying image1.jpg
 
-  Elapsed time: 9.210001230239868
+  Output is in: THIS-IS-PRIVATE-PATH\OutputTest\image1\output.txt
+
+  Elapsed time: 10.896777629852295
   -----------------------------------
 
   Processing image2.jpg
   Finished preprocessing image2.jpg
       ****
   Segmenting image2.jpg
-  Finished Segmenting image2.jpg
+  Finished segmenting image2.jpg
+      ****
+  Classifying image2.jpg
+  Finished classifying image2.jpg
 
-  Elapsed time: 9.017125844955444
+  Output is in: THIS-IS-PRIVATE-PATH\OutputTest\image2\output.txt
+  
+  Elapsed time: 11.643365621566772
   -----------------------------------
 
   Processing image3.jpg
   Finished preprocessing image3.jpg
       ****
   Segmenting image3.jpg
-  Finished Segmenting image3.jpg
+  Finished segmenting image3.jpg
+      ****
+  Classifying image3.jpg
+  Finished classifying image3.jpg
 
-  Elapsed time: 9.497315168380737
+  Output is in: THIS-IS-PRIVATE-PATH\OutputTest\image3\output.txt
+
+  Elapsed time: 11.344895839691162
   -----------------------------------
-  Total elapsed time: 27.72841787338257
-  Average/image = 9.241480747858683
+
+  Processing image4.jpg
+  Finished preprocessing image4.jpg
+      ****
+  Segmenting image4.jpg
+  Finished segmenting image4.jpg
+      ****
+  Classifying image4.jpg
+  Finished classifying image4.jpg
+
+  Output is in: THIS-IS-PRIVATE-PATH\OutputTest\image4\output.txt
+
+  Elapsed time: 10.71731948852539
+  -----------------------------------
+  Total elapsed time: 44.60835003852844
+  Average/image = 11.150589644908905
   -----------------------------------
   ```
