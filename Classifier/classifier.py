@@ -16,10 +16,9 @@ with open('./Classifier/OneHotEncoder.pickle', 'rb') as f:
 	OneHotEncoder = pickle.load(f)
 model = keras.models.load_model('./Classifier/trained_cnn.h5')
 
-def classify(output_directory, stepsize=30, runmode=1):
-
+def classify(output_directory, window_width=40, stepsize=20, runmode=1):
 	alpha_name = "alpha.txt"
-	alpha_txt = open(output_directory + "/" + alpha_name,'w')
+	alpha_txt = open(output_directory + "/" + alpha_name, 'w')
 	lines_directory = output_directory + '/lines'
 
 	line_labels = [ line for line in os.listdir(lines_directory) if os.path.isdir(os.path.join(lines_directory, line)) ]
@@ -40,7 +39,7 @@ def classify(output_directory, stepsize=30, runmode=1):
 			# cv.waitKey(0)
 			
 			height = word_image.shape[0]
-			width = 40 if word_image.shape[1] > 40 else word_image.shape[1]
+			width = window_width if word_image.shape[1] > window_width else word_image.shape[1]
 			letter_images = sliding_window(word_image, [height, width], stepsize)
 			
 			if len(letter_images) > 0:
@@ -58,7 +57,7 @@ def classify(output_directory, stepsize=30, runmode=1):
 	return transcription.transcript(output_directory, alpha_name)
 
 
-def sliding_window(image, windowSize, stepSize=10):
+def sliding_window(image, windowSize, stepSize=20):
 	letter_images = []
 	flag = 0
 	threshold = 235

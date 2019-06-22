@@ -57,8 +57,12 @@ if (not files):
 ##### Main #####
 ################
 
-# Run the program
+# Constants
 line_padding = 35
+window_width = 40
+stepsize = 20
+
+# Run the program
 print ("")
 print ("Processing files from directory:".ljust(line_padding) + input_directory)
 print ("With extension:".ljust(line_padding) + extension)
@@ -95,7 +99,7 @@ for image_name in files:
 
     # Classify segmented image
     print ("Classifying " + image)
-    output_path = classify(output_image_directory, runmode=runmode)
+    output_path = classify(output_image_directory, window_width=window_width, stepsize=stepsize, runmode=runmode)
     print ("Finished classifying " + image)
     print ("")
     print ("Output is in: " + output_path)
