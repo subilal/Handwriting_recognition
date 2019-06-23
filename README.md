@@ -31,12 +31,6 @@ mainSegment.py - executable only for the segmentation
 
 - Utils - contains common functions for handling reading/writing of data.
 
-#### I/O packages:
-
-- Input - contains the input data for preprocessing
-
-- Output - contains the output data for preprocessing and segmentation
-
 ## Commands
 
 (This application is programmed in Python 3. For brevity, `python3` commands will be used as `python` and `pip3` command will be used as `pip`). We have two methods for creating virtual environment (`virtualenv` or `pipenv`), choose anyone.
@@ -45,7 +39,7 @@ Installation:
 
 - install Python 3 (ideally 3.6.x, but not 3.7.x because it does not support TensorFlow yet)
 
-# 1 -Using virtualenv:
+### 1 -Using virtualenv:
 
 - install `virtualenv` using `pip install virtualenv`
 - navigate to the main folder
@@ -54,7 +48,7 @@ Installation:
 - install all the required libraries using `pip install -r requirements.txt`
 
 
-# 2 - Using pipenv:
+### 2 - Using pipenv:
 
 - install `pipenv` using `pip install pipenv`
 - install the program using `pipenv install` when you are in the main folder.
